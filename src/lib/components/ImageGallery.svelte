@@ -1,5 +1,4 @@
 <script lang="ts">
-    import "../../app.css";
     import { onMount, tick } from "svelte";
     import ControlPanel from "$lib/components/ControlPanel.svelte";
     import ImageGrid from "$lib/components/ImageGrid.svelte";
