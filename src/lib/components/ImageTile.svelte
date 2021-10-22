@@ -81,7 +81,10 @@
         cursor: pointer;
         width: 100%;
         margin-bottom: 4px;
-        overflow: hidden;
+        /* Overflow is set to clip instead of hidden 
+        to preserve the sticky behavior of the image title.
+        See https://github.com/w3c/csswg-drafts/issues/865 */
+        overflow: clip;
         background-color: #223;
     }
 
