@@ -64,9 +64,11 @@
                     <ImageTile
                         {starred}
                         {showNsfw}
+                        {idx}
+                        {loadedIdx}
+                        {showIndex}
                         on:click={() => dispatch("select", loadedIdx)}
                     />
-                    <h1 class:enabled={showIndex}>{idx}/{loadedIdx}</h1>
                 </div>
             {/each}
         </div>
@@ -81,24 +83,5 @@
 
     .wrapper {
         position: relative;
-    }
-
-    h1 {
-        visibility: hidden;
-        pointer-events: none;
-        font-size: 100px;
-        text-shadow: 0 0 5px black;
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-
-    h1.enabled {
-        visibility: visible;
     }
 </style>

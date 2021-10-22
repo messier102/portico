@@ -3,6 +3,9 @@
 
     export let starred: StarredImage;
     export let showNsfw: boolean;
+    export let idx: number;
+    export let loadedIdx: number;
+    export let showIndex: boolean;
 
     let imageLoaded = false;
 </script>
@@ -20,12 +23,34 @@
         alt={starred.name}
         on:load={() => (imageLoaded = true)}
     />
+
+    {#if showIndex}
+        <h1 class="index">
+            {idx}/{loadedIdx}
+        </h1>
+    {/if}
+
     <div class="overlay">
         <p>{starred.name}</p>
     </div>
 </div>
 
 <style>
+    .index {
+        grid-area: 1 / 1;
+        font-size: 100px;
+        text-shadow: 0 0 5px black;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        pointer-events: none;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
     .placeholder {
         background-color: #223;
         width: 100%;
@@ -37,6 +62,7 @@
         width: 100%;
         opacity: 0;
         transition: 1s ease;
+        background-color: #223;
     }
 
     .loaded {
