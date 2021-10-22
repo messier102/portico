@@ -11,10 +11,6 @@
 </script>
 
 <div class="tile" on:click>
-    {#if !imageLoaded}
-        <div class="placeholder" />
-    {/if}
-
     <img
         class="content"
         class:loaded={imageLoaded}
@@ -49,13 +45,6 @@
         display: flex;
         justify-content: center;
         align-items: center;
-    }
-
-    .placeholder {
-        background-color: #223;
-        width: 100%;
-        height: 100%;
-        grid-area: 1 / 1;
     }
 
     img {
@@ -93,6 +82,7 @@
         width: 100%;
         margin-bottom: 4px;
         overflow: hidden;
+        background-color: #223;
     }
 
     .content,
