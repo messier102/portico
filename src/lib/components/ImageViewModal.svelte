@@ -11,13 +11,13 @@
 
     export function openModal(idx: number) {
         selectedImageIndex = idx;
-        document.body.style.overflowY = "hidden";
+        document.documentElement.style.overflowY = "hidden";
     }
 
     function closeModal() {
         rotationDegrees = 0;
         selectedImageIndex = null;
-        document.body.style.overflowY = "auto";
+        document.documentElement.style.overflowY = "auto";
     }
 
     async function navigateToNextImage() {
