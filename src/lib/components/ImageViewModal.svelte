@@ -1,6 +1,8 @@
 <script lang="ts">
     import { swipeable, SwipeEvent } from "../actions/swipeable";
     import type { ImageFeed } from "../model/ImageFeed";
+    import { fade } from "svelte/transition";
+    import { sineInOut } from "svelte/easing";
 
     export let imageFeed: ImageFeed;
     export let selectedImageIndex = null;
@@ -80,6 +82,7 @@
         use:swipeable
         on:click={() => closeModal()}
         on:swipe={(e) => handleSwipe(e)}
+        transition:fade={{ duration: 200, easing: sineInOut }}
     >
         <img
             src={image.starred.imageUrl}
@@ -101,6 +104,7 @@
         z-index: 2;
 
         background-color: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(10px);
 
         display: flex;
         justify-content: center;
