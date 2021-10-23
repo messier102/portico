@@ -81,7 +81,9 @@
         gap: 4px;
     }
 
-    .wrapper {
-        position: relative;
+    .column {
+        display: flex;
+        flex-flow: column nowrap;
+        gap: 4px;
     }
 </style>
