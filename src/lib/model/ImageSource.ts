@@ -63,15 +63,23 @@ async function fetchStarboard(
 export class RedditImageSource implements ImageSource {
     private after: string = null;
     private exhausted: boolean = false;
+    private baseUrl: string;
 
-    constructor(private readonly subreddit: string) {}
+    // TODO: Rewrite in a more general way.
+    constructor(subredditOrUsername: string, feedname?: string) {
+        if (feedname) {
+            this.baseUrl = `https://www.reddit.com/user/${subredditOrUsername}/m/${feedname}`;
+        } else {
+            this.baseUrl = `https://www.reddit.com/r/${subredditOrUsername}`;
+        }
+    }
 
     async fetchNextPage(): Promise<StarredImage[]> {
         if (this.exhausted) {
             return [];
         }
 
-        const endpoint = `https://www.reddit.com/r/${this.subreddit}/top.json?t=all&after=${this.after}`;
+        const endpoint = this.baseUrl + `.json?after=${this.after}`;
         const res = await fetch(endpoint);
         const listing = await res.json();
 
