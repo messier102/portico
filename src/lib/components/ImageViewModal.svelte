@@ -8,16 +8,21 @@
     $: image = $imageFeed[selectedImageIndex];
 
     let rotationDegrees: number = 0;
+    let lastScrollPos: number;
 
     export function openModal(idx: number) {
         selectedImageIndex = idx;
-        document.documentElement.style.overflowY = "hidden";
+        lastScrollPos = document.documentElement.scrollTop;
+        document.documentElement.style.position = "fixed";
+        document.documentElement.style.top = `-${lastScrollPos}px`;
     }
 
     function closeModal() {
         rotationDegrees = 0;
         selectedImageIndex = null;
-        document.documentElement.style.overflowY = "auto";
+        document.documentElement.style.position = "static";
+        document.documentElement.style.top = "auto";
+        document.documentElement.scrollTop = lastScrollPos;
     }
 
     async function navigateToNextImage() {
