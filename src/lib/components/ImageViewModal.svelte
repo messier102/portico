@@ -1,6 +1,8 @@
 <script lang="ts">
     import { swipeable, SwipeEvent } from "../actions/swipeable";
     import type { ImageFeed } from "../model/ImageFeed";
+    import { fade } from "svelte/transition";
+    import { sineInOut } from "svelte/easing";
 
     export let imageFeed: ImageFeed;
     export let selectedImageIndex = null;
@@ -8,16 +10,21 @@
     $: image = $imageFeed[selectedImageIndex];
 
     let rotationDegrees: number = 0;
+    let lastScrollPos: number;
 
     export function openModal(idx: number) {
         selectedImageIndex = idx;
-        document.body.style.overflowY = "hidden";
+        lastScrollPos = document.documentElement.scrollTop;
+        document.documentElement.style.position = "fixed";
+        document.documentElement.style.top = `-${lastScrollPos}px`;
     }
 
     function closeModal() {
         rotationDegrees = 0;
         selectedImageIndex = null;
-        document.body.style.overflowY = "auto";
+        document.documentElement.style.position = "static";
+        document.documentElement.style.top = "auto";
+        document.documentElement.scrollTop = lastScrollPos;
     }
 
     async function navigateToNextImage() {
@@ -75,6 +82,7 @@
         use:swipeable
         on:click={() => closeModal()}
         on:swipe={(e) => handleSwipe(e)}
+        transition:fade={{ duration: 200, easing: sineInOut }}
     >
         <img
             src={image.starred.imageUrl}
@@ -96,6 +104,7 @@
         z-index: 2;
 
         background-color: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(10px);
 
         display: flex;
         justify-content: center;

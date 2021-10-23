@@ -3,75 +3,42 @@
 
     export let starred: StarredImage;
     export let showNsfw: boolean;
+    export let idx: number;
+    export let loadedIdx: number;
+    export let showIndex: boolean;
 
     let imageLoaded = false;
 </script>
 
 <div class="tile" on:click>
-    {#if !imageLoaded}
-        <div class="placeholder" />
-    {/if}
-
+    <!-- Element order is significant (determines z-index) -->
     <img
-        class="content"
-        class:loaded={imageLoaded}
-        class:nsfw={!showNsfw && starred.isNsfw}
+        class:hidden={!imageLoaded}
+        class:blurred={!showNsfw && starred.isNsfw}
         src={starred.imageUrl}
         alt={starred.name}
         on:load={() => (imageLoaded = true)}
     />
-    <div class="overlay">
+
+    {#if showIndex}
+        <h1 class="index overlay">
+            {idx}/{loadedIdx}
+        </h1>
+    {/if}
+
+    <div class="title overlay">
         <p>{starred.name}</p>
     </div>
 </div>
 
 <style>
-    .placeholder {
-        background-color: #223;
-        width: 100%;
-        height: 100%;
-        grid-area: 1 / 1;
-    }
-
-    img {
-        width: 100%;
-        opacity: 0;
-        transition: 1s ease;
-    }
-
-    .loaded {
-        opacity: 1;
-    }
-
-    .nsfw {
-        filter: brightness(0.7) blur(32px);
-    }
-
-    p {
-        position: sticky;
-        bottom: 0;
-        margin: 0;
-        padding-right: 10px;
-        padding-bottom: 8px;
-        padding-top: 4px;
-        font-size: 1.3em;
-        text-shadow: 0 0 4px black;
-        overflow: hidden;
-    }
-
     .tile {
         position: relative;
-        display: inline-grid;
-        grid-template: 1fr / 1fr;
+        background-color: #223; /* for placeholder */
         cursor: pointer;
-        width: 100%;
-        margin-bottom: 4px;
-        overflow: hidden;
-    }
-
-    .content,
-    .overlay {
-        grid-area: 1 / 1;
+        /* Overflow is set to clip to preserve the sticky behavior of the image title.
+        See https://github.com/w3c/csswg-drafts/issues/865 */
+        overflow: clip;
     }
 
     .overlay {
@@ -80,19 +47,67 @@
         bottom: 0;
         left: 0;
         right: 0;
-        opacity: 0;
-        overflow-wrap: anywhere;
     }
 
-    .tile:hover .overlay {
-        opacity: 1;
+    img {
+        /* Remove the gap between images due to inline display respecting whitespace.
+        See https://stackoverflow.com/q/19038799 */
+        display: block;
+        width: 100%;
+        transition: opacity 1s ease, filter 1s ease;
+    }
 
+    img.hidden {
+        opacity: 0;
+    }
+
+    img.blurred {
+        filter: brightness(0.7) blur(32px);
+    }
+
+    .index {
+        font-size: 48px;
+        text-shadow: 0 0 5px black;
+
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .title {
         display: flex;
         flex-direction: column;
         justify-content: flex-end;
-        padding: 0 10px;
 
         background-color: rgba(0, 0, 0, 0.4);
+
+        opacity: 0;
         transition: 0.3s ease;
+    }
+
+    .title:hover {
+        opacity: 1;
+    }
+
+    .title p {
+        position: sticky;
+        bottom: 0;
+
+        width: calc(100% - 20px);
+        margin: 0;
+        padding-right: 10px;
+        padding-bottom: 8px;
+        padding-top: 4px;
+
+        font-size: 1.3rem;
+        text-shadow: 0 0 5px black;
+        overflow-wrap: anywhere;
+
+        transition: padding-left 0.3s ease;
+    }
+
+    .title:hover p {
+        /* Slide-in effect */
+        padding-left: 10px;
     }
 </style>
