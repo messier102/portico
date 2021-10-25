@@ -3,10 +3,10 @@
     import ImageGallery from "$lib/components/ImageGallery.svelte";
     import { RedditImageSource } from "$lib/model/ImageSource";
 
-    $: username = $page.params.username;
-    $: feedname = $page.params.feedname;
-    $: imageSource = new RedditImageSource(username, feedname);
-    $: sourceName = `m/${username}/${feedname}`;
+    $: user = $page.params.user;
+    $: feed = $page.params.feed;
+    $: imageSource = new RedditImageSource({ type: "custom-feed", user, feed });
+    $: sourceName = `m/${user}/${feed}`;
 </script>
 
 <ImageGallery {imageSource} {sourceName} />

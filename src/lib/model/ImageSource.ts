@@ -60,17 +60,30 @@ async function fetchStarboard(
     return starredImages.map((i) => ({ isNsfw: true, ...i }));
 }
 
+// TODO: Come up with a better name.
+export type RedditSource = Subreddit | CustomFeed;
+
+export type Subreddit = {
+    type: "subreddit";
+    subreddit: string;
+};
+
+export type CustomFeed = {
+    type: "custom-feed";
+    user: string;
+    feed: string;
+};
+
 export class RedditImageSource implements ImageSource {
     private after: string = null;
     private exhausted: boolean = false;
     private baseUrl: string;
 
-    // TODO: Rewrite in a more general way.
-    constructor(subredditOrUsername: string, feedname?: string) {
-        if (feedname) {
-            this.baseUrl = `https://www.reddit.com/user/${subredditOrUsername}/m/${feedname}`;
+    constructor(source: RedditSource) {
+        if (source.type === "subreddit") {
+            this.baseUrl = `https://www.reddit.com/r/${source.subreddit}`;
         } else {
-            this.baseUrl = `https://www.reddit.com/r/${subredditOrUsername}`;
+            this.baseUrl = `https://www.reddit.com/user/${source.user}/m/${source.feed}`;
         }
     }
 

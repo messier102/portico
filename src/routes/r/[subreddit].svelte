@@ -4,7 +4,7 @@
     import { RedditImageSource } from "$lib/model/ImageSource";
 
     $: subreddit = $page.params.subreddit;
-    $: imageSource = new RedditImageSource(subreddit);
+    $: imageSource = new RedditImageSource({ type: "subreddit", subreddit });
     $: sourceName = `r/${subreddit}`;
 </script>
 
