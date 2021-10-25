@@ -1,7 +1,7 @@
 <script lang="ts">
     import { page } from "$app/stores";
     import ImageGallery from "$lib/components/ImageGallery.svelte";
-    import { StarboardImageSource } from "$lib/model/ImageSource";
+    import { StarboardImageSource } from "$lib/model/sources/hentsu";
 
     $: query = $page.query;
     $: startingTimestamp = query.has("before")

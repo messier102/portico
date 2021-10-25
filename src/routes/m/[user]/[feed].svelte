@@ -1,7 +1,7 @@
 <script lang="ts">
     import { page } from "$app/stores";
     import ImageGallery from "$lib/components/ImageGallery.svelte";
-    import { RedditImageSource } from "$lib/model/ImageSource";
+    import { RedditImageSource } from "$lib/model/sources/reddit";
 
     $: user = $page.params.user;
     $: feed = $page.params.feed;
