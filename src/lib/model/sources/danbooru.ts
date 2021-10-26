@@ -1,27 +1,52 @@
 import type { ImageSource, StarredImage } from "../ImageSource";
 
+export type DanbooruSource = Posts | Explore;
+
+export type Posts = {
+    type: "posts";
+    tags?: string;
+    random?: boolean;
+};
+
+export type Explore = {
+    type: "popular" | "curated" | "viewed";
+    date?: string;
+    scale?: "day" | "month" | "year";
+};
+
 export class DanbooruImageSource implements ImageSource {
     private page = 1;
     private baseUrl: string;
+    private params = new URLSearchParams();
 
-    constructor(private readonly tags?: string) {
-        if (tags) {
+    constructor(source: DanbooruSource) {
+        if (source.type === "posts") {
             this.baseUrl = `https://danbooru.donmai.us/posts.json`;
+            if (source.tags) {
+                this.params.append("tags", source.tags);
+            }
+            if (source.random) {
+                this.params.append("random", "true");
+            }
         } else {
-            this.baseUrl = `https://danbooru.donmai.us/explore/posts/popular.json`;
+            this.baseUrl = `https://danbooru.donmai.us/explore/posts/${source.type}.json`;
+            if (source.date) {
+                this.params.append("date", source.date);
+            }
+            if (source.scale) {
+                this.params.append("scale", source.scale);
+            }
         }
     }
 
     async fetchNextPage(): Promise<StarredImage[]> {
-        const params = new URLSearchParams({
-            page: this.page.toString(),
-        });
-
-        if (this.tags) {
-            params.append("tags", this.tags);
+        // Setting the page parameter causes Danbooru to aggressively cache
+        // the randomized response, returning 304 on subsequent requests.
+        if (!this.params.has("random")) {
+            this.params.set("page", this.page.toString());
         }
 
-        const res = await fetch(this.baseUrl + "?" + params);
+        const res = await fetch(this.baseUrl + "?" + this.params);
         const page = await res.json();
 
         const images = page
