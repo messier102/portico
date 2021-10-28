@@ -7,11 +7,6 @@ export type StarredImage = {
     isNsfw: boolean;
 };
 
-export interface ImageSource {
-    fetchNextPage(): Promise<StarredImage[]>;
-    reset(): void;
-}
-
 export interface Source<PageId> {
     readonly name: string;
     readonly baseUrl: URL;
