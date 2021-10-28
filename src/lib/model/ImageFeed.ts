@@ -4,7 +4,7 @@ import { writable } from "svelte/store";
 import { prefetchDimensions } from "../util/prefetchDimensions";
 import { sleepMs } from "../util/sleepMs";
 import { TaskQueue } from "../util/TaskQueue";
-import type { ImageSource, StarredImage } from "./ImageSource";
+import type { SourceExtractor, StarredImage } from "./ImageSource";
 
 // FIXME: Temporary grouping, need to split according to responsibility.
 export type AnnotatedImage = {
@@ -31,7 +31,7 @@ export class ImageFeed {
 
     subscribe = this.loadedImages.subscribe;
 
-    constructor(private readonly source: ImageSource) {}
+    constructor(private readonly source: SourceExtractor<unknown>) {}
 
     async fetchNext(): Promise<boolean> {
         // TODO: prevent fetching until all images have loaded

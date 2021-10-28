@@ -9,4 +9,4 @@
     $: sourceName = `m/${user}/${feed}`;
 </script>
 
-<ImageGallery {imageSource} {sourceName} />
+<!-- <ImageGallery {imageSource} {sourceName} /> -->

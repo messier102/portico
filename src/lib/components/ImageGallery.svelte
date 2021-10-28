@@ -6,7 +6,7 @@
     import { persisted } from "$lib/model/persisted";
     import { sleepMs } from "$lib/util/sleepMs";
     import { ImageFeed } from "$lib/model/ImageFeed";
-    import type { ImageSource } from "$lib/model/ImageSource";
+    import { Source, SourceExtractor } from "$lib/model/ImageSource";
 
     const columnCount = persisted("columnCount", 3);
     const showIndex = persisted("showIndex", false);
@@ -16,9 +16,9 @@
     let clientWidth: number;
     $: maxColumnCount = Math.max(Math.floor(clientWidth / minColumnWidth), 1);
 
-    export let imageSource: ImageSource;
-    export let sourceName: string;
-    $: imageFeed = new ImageFeed(imageSource);
+    export let imageSource: Source<unknown>;
+    const sourceExtractor = new SourceExtractor(imageSource);
+    const imageFeed = new ImageFeed(sourceExtractor);
 
     let openModal: (idx: number) => void;
 
@@ -54,7 +54,7 @@
 
 <svelte:head>
     <title>
-        {sourceName} - Portico
+        {imageSource.name} - Portico
     </title>
 </svelte:head>
 

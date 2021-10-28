@@ -6,4 +6,4 @@
     const sourceName = "Hentsu Starboard (dummy)";
 </script>
 
-<ImageGallery {imageSource} {sourceName} />
+<!-- <ImageGallery {imageSource} {sourceName} /> -->

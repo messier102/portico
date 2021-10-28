@@ -1,16 +1,11 @@
 <script lang="ts">
     import { page } from "$app/stores";
     import ImageGallery from "$lib/components/ImageGallery.svelte";
-    import { DanbooruImageSource } from "$lib/model/sources/danbooru";
+    import { DanbooruPostsSource } from "$lib/model/sources/danbooru/posts";
 
     const tags = $page.query.get("tags");
     const random = $page.query.has("random");
-    const imageSource = new DanbooruImageSource({
-        type: "posts",
-        tags,
-        random,
-    });
-    const sourceName = `Danbooru (${tags})`;
+    const imageSource = new DanbooruPostsSource(tags, random);
 </script>
 
-<ImageGallery {imageSource} {sourceName} />
+<ImageGallery {imageSource} />

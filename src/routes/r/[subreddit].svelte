@@ -8,4 +8,4 @@
     $: sourceName = `r/${subreddit}`;
 </script>
 
-<ImageGallery {imageSource} {sourceName} />
+<!-- <ImageGallery {imageSource} {sourceName} /> -->

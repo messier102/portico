@@ -18,4 +18,4 @@
         (startingTimestamp ? ` (before ${startingTimestamp}` : "");
 </script>
 
-<ImageGallery {imageSource} {sourceName} />
+<!-- <ImageGallery {imageSource} {sourceName} /> -->

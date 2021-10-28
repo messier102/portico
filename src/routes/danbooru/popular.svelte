@@ -2,16 +2,16 @@
     import { page } from "$app/stores";
 
     import ImageGallery from "$lib/components/ImageGallery.svelte";
-    import { DanbooruImageSource } from "$lib/model/sources/danbooru";
+    import { DanbooruExploreSource } from "$lib/model/sources/danbooru/explore";
 
     const date = $page.query.get("date");
     const scale = $page.query.get("scale");
-    const imageSource = new DanbooruImageSource({
-        type: "popular",
+
+    const imageSource = new DanbooruExploreSource(
+        "popular",
         date,
-        scale: scale as "day" | "month" | "year",
-    });
-    const sourceName = "Danbooru popular";
+        scale as "day" | "month" | "year"
+    );
 </script>
 
-<ImageGallery {imageSource} {sourceName} />
+<ImageGallery {imageSource} />
