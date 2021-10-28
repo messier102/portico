@@ -1,9 +1,8 @@
 <script lang="ts">
     import ImageGallery from "$lib/components/ImageGallery.svelte";
-    import { StarboardImageSource } from "$lib/model/sources/hentsu";
+    import { HentsuDummySource } from "$lib/model/sources/hentsu/dummy";
 
-    $: imageSource = new StarboardImageSource("/starboard.json");
-    const sourceName = "Hentsu Starboard (dummy)";
+    const imageSource = new HentsuDummySource(document.location.toString());
 </script>
 
-<!-- <ImageGallery {imageSource} {sourceName} /> -->
+<ImageGallery {imageSource} />
