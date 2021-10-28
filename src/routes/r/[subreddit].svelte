@@ -1,11 +1,10 @@
 <script lang="ts">
     import { page } from "$app/stores";
     import ImageGallery from "$lib/components/ImageGallery.svelte";
-    import { RedditImageSource } from "$lib/model/sources/reddit";
+    import { RedditSubredditSource } from "$lib/model/sources/reddit/subreddit";
 
-    $: subreddit = $page.params.subreddit;
-    $: imageSource = new RedditImageSource({ type: "subreddit", subreddit });
-    $: sourceName = `r/${subreddit}`;
+    const subreddit = $page.params.subreddit;
+    const imageSource = new RedditSubredditSource(subreddit);
 </script>
 
-<!-- <ImageGallery {imageSource} {sourceName} /> -->
+<ImageGallery {imageSource} />
