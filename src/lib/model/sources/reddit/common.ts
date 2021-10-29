@@ -1,9 +1,14 @@
-export const parsePage = (page: unknown) =>
-    (page as any).data.children.map(({ data }) => ({
-        name: data.title,
-        imageUrl: data.url,
-        isNsfw: data.over_18,
-    }));
+import type { StarredImage } from "$lib/model/ImageSource";
+
+export const parsePage = (page: RedditListing): StarredImage[] =>
+    page.data.children.map(
+        ({ data }) =>
+            ({
+                name: data.title,
+                imageUrl: data.url,
+                isNsfw: data.over_18,
+            } as StarredImage)
+    );
 
 export type RedditResponse = RedditListing | RedditStatus;
 
@@ -25,7 +30,7 @@ export type RedditListing = {
         dist: number;
         modhash: string;
         geo_filter: unknown | null;
-        children: { kind: "t3"; data: RedditLink };
+        children: { kind: "t3"; data: RedditLink }[];
     };
 };
 

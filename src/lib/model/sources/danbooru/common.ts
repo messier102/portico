@@ -1,11 +1,16 @@
-export const parsePage = (page) =>
+import type { StarredImage } from "$lib/model/ImageSource";
+
+export const parsePage = (page: DanbooruPage): StarredImage[] =>
     page
         .filter((item) => item.file_url !== null)
-        .map((item) => ({
-            name: item.md5,
-            imageUrl: item.file_url,
-            isNsfw: item.rating === "e" || item.rating === "q",
-        }));
+        .map(
+            (item) =>
+                ({
+                    name: item.md5,
+                    imageUrl: item.file_url,
+                    isNsfw: item.rating === "e" || item.rating === "q",
+                } as StarredImage)
+        );
 
 type Timestamp = string;
 
