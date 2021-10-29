@@ -12,7 +12,8 @@ export interface Source<PageId> {
     readonly baseUrl: URL;
     readonly initialPageId: PageId;
 
-    pageUrl(pageId?: PageId): [URL, PageId];
+    pageUrl(pageId?: PageId): URL;
+    nextPageId(pageId: PageId, page: unknown): PageId;
     parsePage(page: unknown): StarredImage[];
 }
 
@@ -24,14 +25,14 @@ export class SourceExtractor<PageId> {
     }
 
     async fetchNextPage(): Promise<StarredImage[]> {
-        const [pageUrl, nextPageId] = this.source.pageUrl(this.nextPageId);
+        const pageUrl = this.source.pageUrl(this.nextPageId);
 
         const response = await fetch(pageUrl.toString());
         const page = await response.json();
 
         const images = this.source.parsePage(page);
 
-        this.nextPageId = nextPageId;
+        this.nextPageId = this.source.nextPageId(this.nextPageId, page);
 
         return images;
     }

@@ -24,11 +24,14 @@ export class DanbooruExploreSource implements Source<number> {
         }
     }
 
-    pageUrl(pageId: number): [URL, number] {
+    pageUrl(pageId: number): URL {
         const url = new URL(this.baseUrl);
         url.searchParams.set("page", pageId.toString());
+        return url;
+    }
 
-        return [url, pageId + 1];
+    nextPageId(pageId: number): number {
+        return pageId + 1;
     }
 
     parsePage = parsePage;

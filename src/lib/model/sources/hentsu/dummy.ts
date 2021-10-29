@@ -14,9 +14,13 @@ export class HentsuDummySource implements Source<null> {
         this.baseUrl = new URL("/starboard.json", absoluteUrl);
     }
 
-    pageUrl(): [URL, null] {
+    pageUrl(): URL {
         const url = new URL(this.baseUrl);
-        return [url, null];
+        return url;
+    }
+
+    nextPageId(): null {
+        return null;
     }
 
     parsePage(page: unknown): StarredImage[] {

@@ -1,10 +1,10 @@
 import type { Source } from "$lib/model/ImageSource";
 import { parsePage } from "./common";
 
-export class RedditCustomFeedSource implements Source<number> {
+export class RedditCustomFeedSource implements Source<string> {
     name: string;
     baseUrl: URL;
-    initialPageId: number;
+    initialPageId: string;
 
     constructor(readonly user: string, readonly feed: string) {
         this.name = `m/${user}/${feed}`;
@@ -12,13 +12,14 @@ export class RedditCustomFeedSource implements Source<number> {
         this.initialPageId = null;
     }
 
-    pageUrl(pageId?: number): [URL, number] {
+    pageUrl(pageId?: string): URL {
         const url = new URL(this.baseUrl);
         url.searchParams.set("after", String(pageId));
-        
-        // FIXME: oops, can't return next pageId before downloading the page
-        // :facepalm:
-        return [url, pageId];
+        return url;
+    }
+
+    nextPageId(pageId: string, page: unknown): string {
+        return (page as any).data.after;
     }
 
     parsePage = parsePage;

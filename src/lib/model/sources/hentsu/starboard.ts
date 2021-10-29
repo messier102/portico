@@ -13,13 +13,22 @@ export class HentsuStarboardSource implements Source<number> {
         this.initialPageId = startingTimestamp ?? Date.now();
     }
 
-    pageUrl(pageId?: number): [URL, number] {
+    pageUrl(pageId?: number): URL {
         const url = new URL(this.baseUrl);
         url.searchParams.set("olderThan", pageId.toString());
 
-        // FIXME: oops, can't return next pageId before downloading the page
-        // :facepalm:
-        return [url, pageId];
+        return url;
+    }
+
+    nextPageId(_pageId: number, page: unknown): number {
+        const images = page as StarredImage[];
+        
+        if (images.length > 0) {
+            return images[images.length - 1].starredAt;
+        } else {
+            // TODO: implement exhaustion checking;
+            return null;
+        }
     }
 
     parsePage(page: unknown): StarredImage[] {
