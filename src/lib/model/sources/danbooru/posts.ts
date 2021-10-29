@@ -18,6 +18,16 @@ export class DanbooruPostsSource implements Source<number> {
         }
     }
 
+    isExhausted(page: unknown): boolean {
+        return (
+            (page as unknown[]).length === 0 || (page as any).success === false
+        );
+    }
+
+    hasNextPage(page: unknown): boolean {
+        return true;
+    }
+
     pageUrl(pageId: number | null): URL {
         const url = new URL(this.baseUrl);
 

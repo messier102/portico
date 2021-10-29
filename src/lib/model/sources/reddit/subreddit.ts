@@ -12,6 +12,14 @@ export class RedditSubredditSource implements Source<string> {
         this.initialPageId = null;
     }
 
+    isExhausted(page: unknown): boolean {
+        return (page as any).data.dist === 0;
+    }
+
+    hasNextPage(page: unknown): boolean {
+        return (page as any).data.after !== null;
+    }
+
     pageUrl(pageId?: string): URL {
         const url = new URL(this.baseUrl);
         url.searchParams.set("after", String(pageId));

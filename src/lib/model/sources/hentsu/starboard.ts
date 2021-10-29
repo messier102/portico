@@ -13,6 +13,14 @@ export class HentsuStarboardSource implements Source<number> {
         this.initialPageId = startingTimestamp ?? Date.now();
     }
 
+    isExhausted(page: unknown): boolean {
+        return (page as unknown[]).length === 0;
+    }
+
+    hasNextPage(page: unknown): boolean {
+        return true;
+    }
+
     pageUrl(pageId?: number): URL {
         const url = new URL(this.baseUrl);
         url.searchParams.set("olderThan", pageId.toString());

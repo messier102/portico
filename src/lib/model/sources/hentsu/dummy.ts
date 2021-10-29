@@ -14,6 +14,14 @@ export class HentsuDummySource implements Source<null> {
         this.baseUrl = new URL("/starboard.json", absoluteUrl);
     }
 
+    isExhausted(page: unknown): boolean {
+        return (page as unknown[]).length === 0;
+    }
+
+    hasNextPage(page: unknown): boolean {
+        return true;
+    }
+
     pageUrl(): URL {
         const url = new URL(this.baseUrl);
         return url;
