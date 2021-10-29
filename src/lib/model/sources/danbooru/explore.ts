@@ -1,7 +1,8 @@
 import type { Source } from "$lib/model/ImageSource";
-import { parsePage } from "./common";
+import type { DanbooruResponse } from "./common";
+import { isPage, parsePage } from "./common";
 
-export class DanbooruExploreSource implements Source<number> {
+export class DanbooruExploreSource implements Source<number, DanbooruResponse> {
     readonly name: string;
     readonly baseUrl: URL;
     readonly initialPageId: number = 1;
@@ -24,13 +25,17 @@ export class DanbooruExploreSource implements Source<number> {
         }
     }
 
-    isExhausted(page: unknown): boolean {
-        return (
-            (page as unknown[]).length === 0 || (page as any).success === false
-        );
+    isExhausted(page: DanbooruResponse): boolean {
+        if (isPage(page)) {
+            return page.length === 0;
+        } else {
+            return page.success === false;
+        }
     }
 
-    hasNextPage(page: unknown): boolean {
+    hasNextPage(): boolean {
+        // We could check pageId < 1000, but that might break if we allow
+        // linking upgraded accounts.
         return true;
     }
 

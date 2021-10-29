@@ -1,6 +1,6 @@
 import type { Source, StarredImage } from "$lib/model/ImageSource";
 
-export class HentsuDummySource implements Source<null> {
+export class HentsuDummySource implements Source<null, StarredImage[]> {
     name: string;
     baseUrl: URL;
     initialPageId: null;
@@ -14,11 +14,11 @@ export class HentsuDummySource implements Source<null> {
         this.baseUrl = new URL("/starboard.json", absoluteUrl);
     }
 
-    isExhausted(page: unknown): boolean {
-        return (page as unknown[]).length === 0;
+    isExhausted(page: StarredImage[]): boolean {
+        return page.length === 0;
     }
 
-    hasNextPage(page: unknown): boolean {
+    hasNextPage(): boolean {
         return true;
     }
 

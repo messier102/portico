@@ -1,6 +1,6 @@
 import type { Source, StarredImage } from "$lib/model/ImageSource";
 
-export class HentsuStarboardSource implements Source<number> {
+export class HentsuStarboardSource implements Source<number, StarredImage[]> {
     name: string;
     baseUrl: URL;
     initialPageId: number;
@@ -13,11 +13,11 @@ export class HentsuStarboardSource implements Source<number> {
         this.initialPageId = startingTimestamp ?? Date.now();
     }
 
-    isExhausted(page: unknown): boolean {
-        return (page as unknown[]).length === 0;
+    isExhausted(page: StarredImage[]): boolean {
+        return page.length === 0;
     }
 
-    hasNextPage(page: unknown): boolean {
+    hasNextPage(): boolean {
         return true;
     }
 
@@ -30,7 +30,7 @@ export class HentsuStarboardSource implements Source<number> {
 
     nextPageId(_pageId: number, page: unknown): number {
         const images = page as StarredImage[];
-        
+
         if (images.length > 0) {
             return images[images.length - 1].starredAt;
         } else {

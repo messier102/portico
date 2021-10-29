@@ -1,7 +1,8 @@
 import type { Source } from "$lib/model/ImageSource";
-import { parsePage } from "./common";
+import type { RedditResponse } from "./common";
+import { isListing, parsePage } from "./common";
 
-export class RedditSubredditSource implements Source<string> {
+export class RedditSubredditSource implements Source<string, RedditResponse> {
     name: string;
     baseUrl: URL;
     initialPageId: string;
@@ -12,12 +13,20 @@ export class RedditSubredditSource implements Source<string> {
         this.initialPageId = null;
     }
 
-    isExhausted(page: unknown): boolean {
-        return (page as any).data.dist === 0;
+    isExhausted(page: RedditResponse): boolean {
+        if (isListing(page)) {
+            return page.data.dist === 0;
+        } else {
+            return true;
+        }
     }
 
-    hasNextPage(page: unknown): boolean {
-        return (page as any).data.after !== null;
+    hasNextPage(page: RedditResponse): boolean {
+        if (isListing(page)) {
+            return page.data.after !== null;
+        } else {
+            return false;
+        }
     }
 
     pageUrl(pageId?: string): URL {
@@ -26,8 +35,12 @@ export class RedditSubredditSource implements Source<string> {
         return url;
     }
 
-    nextPageId(pageId: string, page: unknown): string {
-        return (page as any).data.after;
+    nextPageId(pageId: string, page: RedditResponse): string {
+        if (isListing(page)) {
+            return page.data.after;
+        } else {
+            return null;
+        }
     }
 
     parsePage = parsePage;

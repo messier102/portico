@@ -16,7 +16,7 @@
     let clientWidth: number;
     $: maxColumnCount = Math.max(Math.floor(clientWidth / minColumnWidth), 1);
 
-    export let imageSource: Source<unknown>;
+    export let imageSource: Source<unknown, unknown>;
     const sourceExtractor = new SourceExtractor(imageSource);
     const imageFeed = new ImageFeed(sourceExtractor);
 

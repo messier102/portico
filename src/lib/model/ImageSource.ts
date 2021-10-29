@@ -7,23 +7,23 @@ export type StarredImage = {
     isNsfw: boolean;
 };
 
-export interface Source<PageId> {
+export interface Source<PageId, Page> {
     readonly name: string;
     readonly baseUrl: URL;
     readonly initialPageId: PageId;
 
     pageUrl(pageId?: PageId): URL;
-    isExhausted(page: unknown): boolean;
-    hasNextPage(page: unknown): boolean;
-    nextPageId(pageId: PageId, page: unknown): PageId;
-    parsePage(page: unknown): StarredImage[];
+    isExhausted(page: Page): boolean;
+    hasNextPage(page: Page): boolean;
+    nextPageId(pageId: PageId, page: Page): PageId;
+    parsePage(page: Page): StarredImage[];
 }
 
-export class SourceExtractor<PageId> {
+export class SourceExtractor<PageId, Page> {
     private nextPageId: PageId;
     private exhausted: boolean;
 
-    constructor(readonly source: Source<PageId>) {
+    constructor(readonly source: Source<PageId, Page>) {
         this.nextPageId = source.initialPageId;
         this.exhausted = false;
     }

@@ -31,7 +31,7 @@ export class ImageFeed {
 
     subscribe = this.loadedImages.subscribe;
 
-    constructor(private readonly source: SourceExtractor<unknown>) {}
+    constructor(private readonly source: SourceExtractor<unknown, unknown>) {}
 
     async fetchNext(): Promise<boolean> {
         // TODO: prevent fetching until all images have loaded
