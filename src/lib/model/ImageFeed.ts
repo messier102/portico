@@ -4,12 +4,12 @@ import { writable } from "svelte/store";
 import { prefetchDimensions } from "../util/prefetchDimensions";
 import { sleepMs } from "../util/sleepMs";
 import { TaskQueue } from "../util/TaskQueue";
-import type { SourceExtractor, StarredImage } from "./ImageSource";
+import type { SourceStream, Image } from "./ImageSource";
 
 // FIXME: Temporary grouping, need to split according to responsibility.
 export type AnnotatedImage = {
     img: HTMLImageElement;
-    starred: StarredImage;
+    starred: Image;
     idx: number;
     loadedIdx: number;
 };
@@ -18,7 +18,7 @@ export class ImageFeed {
     private isFetching: boolean = false;
     private lastFetchedAt: number = 0;
 
-    private starboardData: StarredImage[] = [];
+    private starboardData: Image[] = [];
 
     private loadedImageIdxs: Set<number> = new Set();
     private loadedImages: Writable<AnnotatedImage[]> = writable([]);
@@ -31,7 +31,7 @@ export class ImageFeed {
 
     subscribe = this.loadedImages.subscribe;
 
-    constructor(private readonly source: SourceExtractor<unknown, unknown>) {}
+    constructor(private readonly source: SourceStream<unknown, unknown>) {}
 
     async fetchNext(): Promise<boolean> {
         // TODO: prevent fetching until all images have loaded

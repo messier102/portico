@@ -1,16 +1,4 @@
-import type { StarredImage } from "$lib/model/ImageSource";
-
-export const parsePage = (page: DanbooruPage): StarredImage[] =>
-    page
-        .filter((item) => item.file_url !== null)
-        .map(
-            (item) =>
-                ({
-                    name: item.md5,
-                    imageUrl: item.file_url,
-                    isNsfw: item.rating === "e" || item.rating === "q",
-                } as StarredImage)
-        );
+import type { SourceResponse, Image } from "$lib/model/ImageSource";
 
 type Timestamp = string;
 
@@ -71,10 +59,39 @@ export type DanbooruStatus = {
     backtrace: string[];
 };
 
-export type DanbooruPage = DanbooruPost[];
+export type DanbooruResponse = DanbooruPost[] | DanbooruStatus;
 
-export type DanbooruResponse = DanbooruPage | DanbooruStatus;
-
-export function isPage(page: DanbooruResponse): page is DanbooruPage {
-    return (page as DanbooruPage).length !== undefined;
+export function isValid(
+    response: DanbooruResponse
+): response is DanbooruPost[] {
+    return (response as DanbooruPost[]).length !== undefined;
 }
+
+export const parseDanbooruResponse = (
+    response: DanbooruResponse,
+    pageId: number | null
+): SourceResponse<number> => {
+    if (!isValid(response)) {
+        return { status: "invalid" };
+    }
+
+    if (response.length === 0) {
+        return { status: "exhausted" };
+    }
+
+    const images = response
+        .filter((item) => item.file_url !== null)
+        .map(
+            (item): Image => ({
+                name: item.md5,
+                imageUrl: item.file_url,
+                isNsfw: item.rating === "e" || item.rating === "q",
+            })
+        );
+
+    return {
+        status: "success",
+        images,
+        nextPageId: (pageId ?? 1) + 1,
+    };
+};

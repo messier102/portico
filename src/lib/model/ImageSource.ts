@@ -1,56 +1,66 @@
-export type StarredImage = {
+export type Image = {
     name: string;
     imageUrl: string;
-    directUrl: string;
-    starredBy: string;
-    starredAt: number;
     isNsfw: boolean;
 };
 
-export interface Source<PageId, Page> {
-    readonly name: string;
-    readonly baseUrl: URL;
-    readonly initialPageId: PageId;
+export type SourceResponse<PageId> =
+    | { status: "success"; images: Image[]; nextPageId: PageId | null }
+    | { status: "exhausted" }
+    | { status: "invalid" };
 
-    pageUrl(pageId?: PageId): URL;
-    isExhausted(page: Page): boolean;
-    hasNextPage(page: Page): boolean;
-    nextPageId(pageId: PageId, page: Page): PageId;
-    parsePage(page: Page): StarredImage[];
+export interface Source<TPageId, TResponse> {
+    name: string;
+    baseUrl: URL;
+
+    // pass null for initial page, is there a more explicit way?
+    getPageUrl(pageId: TPageId | null): URL;
+
+    parseResponse(
+        response: TResponse,
+        pageId: TPageId | null // get next pageId for sequentially indexed pages (pageId + 1)
+    ): SourceResponse<TPageId>;
 }
 
-export class SourceExtractor<PageId, Page> {
-    private nextPageId: PageId;
-    private exhausted: boolean;
+export class SourceStream<TPageId, TResponse> {
+    private nextPageId: TPageId = null;
+    private exhausted: boolean = false;
 
-    constructor(readonly source: Source<PageId, Page>) {
-        this.nextPageId = source.initialPageId;
-        this.exhausted = false;
-    }
+    constructor(private readonly source: Source<TPageId, TResponse>) {}
 
-    async fetchNextPage(): Promise<StarredImage[]> {
+    async fetchNextPage(): Promise<Image[]> {
         if (this.exhausted) {
             return [];
         }
 
-        const pageUrl = this.source.pageUrl(this.nextPageId);
+        const response = await this.fetchPage();
 
-        const response = await fetch(pageUrl.toString());
-        const page = await response.json();
-
-        if (this.source.isExhausted(page)) {
+        if (response.status !== "success") {
             this.exhausted = true;
             return [];
         }
 
-        const images = this.source.parsePage(page);
-
-        if (!this.source.hasNextPage(page)) {
-            this.exhausted = true;
+        if (response.nextPageId) {
+            this.nextPageId = response.nextPageId;
         } else {
-            this.nextPageId = this.source.nextPageId(this.nextPageId, page);
+            this.exhausted = true;
         }
 
-        return images;
+        return response.images;
+    }
+
+    async fetchPage(): Promise<SourceResponse<TPageId>> {
+        const pageId = this.nextPageId;
+        const pageUrl = this.source.getPageUrl(pageId);
+
+        const httpResponse = await fetch(pageUrl.toString());
+        const sourceResponse = await httpResponse.json();
+
+        const parsedResponse = this.source.parseResponse(
+            sourceResponse,
+            pageId
+        );
+
+        return parsedResponse;
     }
 }

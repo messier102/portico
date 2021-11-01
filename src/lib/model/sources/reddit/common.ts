@@ -1,13 +1,12 @@
-import type { StarredImage } from "$lib/model/ImageSource";
+import type { Image, SourceResponse } from "$lib/model/ImageSource";
 
-export const parsePage = (page: RedditListing): StarredImage[] =>
+export const parsePage = (page: RedditListing): Image[] =>
     page.data.children.map(
-        ({ data }) =>
-            ({
-                name: data.title,
-                imageUrl: data.url,
-                isNsfw: data.over_18,
-            } as StarredImage)
+        ({ data }): Image => ({
+            name: data.title,
+            imageUrl: data.url,
+            isNsfw: data.over_18,
+        })
     );
 
 export type RedditResponse = RedditListing | RedditStatus;
@@ -145,4 +144,30 @@ export type RedditLink = {
     num_crossposts: number;
     media: unknown | null;
     is_video: boolean;
+};
+
+export function getRedditPageUrl(pageId: string | null): URL {
+    const url = new URL(this.baseUrl);
+    if (pageId) {
+        url.searchParams.set("after", String(pageId));
+    }
+    return url;
+}
+
+export const parseRedditResponse = (
+    response: RedditResponse
+): SourceResponse<string> => {
+    if (!isListing(response)) {
+        return { status: "invalid" };
+    }
+
+    if (response.data.dist === 0) {
+        return { status: "exhausted" };
+    }
+
+    return {
+        status: "success",
+        images: parsePage(response),
+        nextPageId: response.data.after,
+    };
 };

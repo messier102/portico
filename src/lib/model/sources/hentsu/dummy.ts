@@ -1,9 +1,9 @@
-import type { Source, StarredImage } from "$lib/model/ImageSource";
+import type { Source, SourceResponse, Image } from "$lib/model/ImageSource";
+import type { StarredImage } from "./common";
 
 export class HentsuDummySource implements Source<null, StarredImage[]> {
     name: string;
     baseUrl: URL;
-    initialPageId: null;
 
     // `URL` constructor cannot produce relative URLs, so we have to get around
     // this by passing an absolute URL from the UI code explicitly.
@@ -14,27 +14,15 @@ export class HentsuDummySource implements Source<null, StarredImage[]> {
         this.baseUrl = new URL("/starboard.json", absoluteUrl);
     }
 
-    isExhausted(page: StarredImage[]): boolean {
-        return page.length === 0;
+    getPageUrl(): URL {
+        return new URL(this.baseUrl);
     }
 
-    hasNextPage(): boolean {
-        return true;
-    }
-
-    pageUrl(): URL {
-        const url = new URL(this.baseUrl);
-        return url;
-    }
-
-    nextPageId(): null {
-        return null;
-    }
-
-    parsePage(page: unknown): StarredImage[] {
-        return (page as StarredImage[]).map((item) => ({
-            isNsfw: true,
-            ...item,
-        }));
+    parseResponse(response: StarredImage[]): SourceResponse<null> {
+        return {
+            status: "success",
+            images: response as Image[],
+            nextPageId: null,
+        };
     }
 }

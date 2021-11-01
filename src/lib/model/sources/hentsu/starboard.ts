@@ -1,48 +1,34 @@
-import type { Source, StarredImage } from "$lib/model/ImageSource";
+import type { Source, SourceResponse, Image } from "$lib/model/ImageSource";
+import type { StarredImage } from "./common";
 
 export class HentsuStarboardSource implements Source<number, StarredImage[]> {
     name: string;
     baseUrl: URL;
-    initialPageId: number;
 
     constructor(readonly startingTimestamp?: number) {
         this.name = "Hentsu starboard";
         this.baseUrl = new URL(
             "https://starboard-9xp4qxvm.ew.gateway.dev/v1/starred"
         );
-        this.initialPageId = startingTimestamp ?? Date.now();
     }
 
-    isExhausted(page: StarredImage[]): boolean {
-        return page.length === 0;
-    }
-
-    hasNextPage(): boolean {
-        return true;
-    }
-
-    pageUrl(pageId?: number): URL {
+    getPageUrl(pageId: number | null): URL {
         const url = new URL(this.baseUrl);
-        url.searchParams.set("olderThan", pageId.toString());
-
+        if (pageId) {
+            url.searchParams.set("olderThan", pageId.toString());
+        }
         return url;
     }
 
-    nextPageId(_pageId: number, page: unknown): number {
-        const images = page as StarredImage[];
-
-        if (images.length > 0) {
-            return images[images.length - 1].starredAt;
-        } else {
-            // TODO: implement exhaustion checking;
-            return null;
+    parseResponse(response: StarredImage[]): SourceResponse<number> {
+        if (response.length === 0) {
+            return { status: "exhausted" };
         }
-    }
 
-    parsePage(page: unknown): StarredImage[] {
-        return (page as StarredImage[]).map((item) => ({
-            isNsfw: true,
-            ...item,
-        }));
+        return {
+            status: "success",
+            images: response as Image[],
+            nextPageId: response[response.length - 1].starredAt,
+        };
     }
 }
