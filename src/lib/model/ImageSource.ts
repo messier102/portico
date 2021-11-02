@@ -4,8 +4,8 @@ export type Image = {
     isNsfw: boolean;
 };
 
-export type SourceResponse<PageId> =
-    | { status: "success"; images: Image[]; nextPageId: PageId | null }
+export type SourceResponse<TPageId> =
+    | { status: "success"; images: Image[]; nextPageId: TPageId | null }
     | { status: "exhausted" }
     | { status: "invalid" };
 
@@ -33,7 +33,10 @@ export class SourceStream<TPageId, TResponse> {
             return [];
         }
 
-        const response = await this.fetchPage();
+        const response = await SourceStream.fetchPage(
+            this.source,
+            this.nextPageId
+        );
 
         if (response.status !== "success") {
             this.exhausted = true;
@@ -49,17 +52,16 @@ export class SourceStream<TPageId, TResponse> {
         return response.images;
     }
 
-    async fetchPage(): Promise<SourceResponse<TPageId>> {
-        const pageId = this.nextPageId;
-        const pageUrl = this.source.getPageUrl(pageId);
+    private static async fetchPage<TPageId, TResponse>(
+        source: Source<TPageId, TResponse>,
+        pageId: TPageId
+    ): Promise<SourceResponse<TPageId>> {
+        const pageUrl = source.getPageUrl(pageId);
 
         const httpResponse = await fetch(pageUrl.toString());
         const sourceResponse = await httpResponse.json();
 
-        const parsedResponse = this.source.parseResponse(
-            sourceResponse,
-            pageId
-        );
+        const parsedResponse = source.parseResponse(sourceResponse, pageId);
 
         return parsedResponse;
     }

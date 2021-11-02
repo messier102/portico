@@ -11,7 +11,9 @@ export class RedditCustomFeedSource implements Source<string, RedditResponse> {
         this.baseUrl = new URL(`https://www.reddit.com/${user}/m/${feed}.json`);
     }
 
-    getPageUrl = getRedditPageUrl.bind(this);
+    getPageUrl(pageId: string): URL {
+        return getRedditPageUrl(this.baseUrl, pageId);
+    }
 
     parseResponse = parseRedditResponse;
 }

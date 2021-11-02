@@ -1,14 +1,5 @@
 import type { Image, SourceResponse } from "$lib/model/ImageSource";
 
-export const parsePage = (page: RedditListing): Image[] =>
-    page.data.children.map(
-        ({ data }): Image => ({
-            name: data.title,
-            imageUrl: data.url,
-            isNsfw: data.over_18,
-        })
-    );
-
 export type RedditResponse = RedditListing | RedditStatus;
 
 export function isListing(response: RedditResponse): response is RedditListing {
@@ -33,6 +24,8 @@ export type RedditListing = {
     };
 };
 
+// `unknown` fields are those that were set to something like null or [] in the
+// response I was using to make the schema off of.
 export type RedditLink = {
     approved_at_utc: unknown | null;
     subreddit: string;
@@ -146,17 +139,17 @@ export type RedditLink = {
     is_video: boolean;
 };
 
-export function getRedditPageUrl(pageId: string | null): URL {
-    const url = new URL(this.baseUrl);
+export function getRedditPageUrl(baseUrl: URL, pageId: string | null): URL {
+    const url = new URL(baseUrl);
     if (pageId) {
         url.searchParams.set("after", String(pageId));
     }
     return url;
 }
 
-export const parseRedditResponse = (
+export function parseRedditResponse(
     response: RedditResponse
-): SourceResponse<string> => {
+): SourceResponse<string> {
     if (!isListing(response)) {
         return { status: "invalid" };
     }
@@ -165,9 +158,17 @@ export const parseRedditResponse = (
         return { status: "exhausted" };
     }
 
+    const images = response.data.children.map(
+        ({ data }): Image => ({
+            name: data.title,
+            imageUrl: data.url,
+            isNsfw: data.over_18,
+        })
+    );
+
     return {
         status: "success",
-        images: parsePage(response),
+        images,
         nextPageId: response.data.after,
     };
-};
+}
