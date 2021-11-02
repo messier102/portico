@@ -1,12 +1,11 @@
 <script lang="ts">
     import { page } from "$app/stores";
     import ImageGallery from "$lib/components/ImageGallery.svelte";
-    import { RedditImageSource } from "$lib/model/sources/reddit";
+    import { RedditCustomFeedSource } from "$lib/model/sources/reddit/customFeed";
 
-    $: user = $page.params.user;
-    $: feed = $page.params.feed;
-    $: imageSource = new RedditImageSource({ type: "custom-feed", user, feed });
-    $: sourceName = `m/${user}/${feed}`;
+    const user = $page.params.user;
+    const feed = $page.params.feed;
+    const imageSource = new RedditCustomFeedSource(user, feed);
 </script>
 
-<ImageGallery {imageSource} {sourceName} />
+<ImageGallery {imageSource} />
