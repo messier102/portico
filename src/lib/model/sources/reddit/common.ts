@@ -141,6 +141,11 @@ export type RedditLink = {
 
 export function getRedditPageUrl(baseUrl: URL, pageId: string | null): URL {
     const url = new URL(baseUrl);
+    
+    // Prevent encoding `<`, `>`, `&` as HTML entities
+    // See https://github.com/messier102/portico/issues/6#issuecomment-954486386
+    url.searchParams.set("raw_json", "1");
+
     if (pageId) {
         url.searchParams.set("after", String(pageId));
     }
