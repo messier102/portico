@@ -6,7 +6,7 @@ export function prefetchDimensions(
 ): Promise<Dimensions> {
     return new Promise((resolve) => {
         const poll = setInterval(() => {
-            if (image.naturalWidth && image.naturalHeight) {
+            if (image.naturalWidth !== 0 && image.naturalHeight !== 0) {
                 clearInterval(poll);
                 resolve({
                     width: image.naturalWidth,

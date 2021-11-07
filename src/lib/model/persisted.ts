@@ -3,7 +3,7 @@ import type { Writable } from "svelte/store";
 
 export function persisted<T>(key: string, initial: T): Writable<T> {
     const previousValueStr = window.localStorage.getItem(key);
-    const previousValue = previousValueStr
+    const previousValue = (previousValueStr !== null)
         ? JSON.parse(previousValueStr)
         : initial;
 

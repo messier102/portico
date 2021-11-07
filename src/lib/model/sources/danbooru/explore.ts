@@ -16,17 +16,17 @@ export class DanbooruExploreSource implements Source<number, DanbooruResponse> {
             `https://danbooru.donmai.us/explore/posts/${type}.json`
         );
 
-        if (date) {
+        if (date !== null) {
             this.baseUrl.searchParams.set("date", date);
         }
-        if (scale) {
+        if (scale !== null) {
             this.baseUrl.searchParams.set("scale", scale);
         }
     }
 
     getPageUrl(pageId: number | null): URL {
         const url = new URL(this.baseUrl);
-        if (pageId) {
+        if (pageId !== null) {
             url.searchParams.set("page", pageId.toString());
         }
         return url;

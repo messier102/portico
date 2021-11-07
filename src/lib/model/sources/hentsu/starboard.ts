@@ -15,7 +15,7 @@ export class HentsuStarboardSource implements Source<number, StarredImage[]> {
     getPageUrl(pageId: number | null): URL {
         const url = new URL(this.baseUrl);
 
-        if (pageId || this.startingTimestamp) {
+        if (pageId !== null || this.startingTimestamp !== null) {
             const timestamp = (pageId ?? this.startingTimestamp) as number;
             url.searchParams.set("olderThan", timestamp.toString());
         }
