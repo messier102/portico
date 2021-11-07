@@ -5,7 +5,7 @@
     export let showNsfw: boolean;
 
     $: columnCounts = [
-        ...Array(maxColumnCount !== null ? maxColumnCount + 1 : 3).keys(),
+        ...Array(!isNaN(maxColumnCount) ? maxColumnCount + 1 : 3).keys(),
     ].slice(1);
 </script>
 
