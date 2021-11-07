@@ -1,5 +1,5 @@
 <script lang="ts" context="module">
-    import { LoadOutput } from "@sveltejs/kit";
+    import type { LoadOutput } from "@sveltejs/kit";
 
     export async function load(): Promise<LoadOutput> {
         const minTimestamp = 1593860599394; // first item on the starboard
