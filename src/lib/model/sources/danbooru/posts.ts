@@ -6,7 +6,7 @@ export class DanbooruPostsSource implements Source<number, DanbooruResponse> {
     readonly name: string;
     readonly baseUrl: URL;
 
-    constructor(tags?: string, readonly random?: boolean) {
+    constructor(tags: string | null, readonly random: boolean | null) {
         this.name = "Danbooru posts";
         this.baseUrl = new URL(`https://danbooru.donmai.us/posts.json`);
 

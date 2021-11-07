@@ -20,7 +20,10 @@
         //
         // TODO: Improve the algorithm to favor left-to-right ordering where possible.
 
-        const columns = Array.from(Array(columnCount), () => []);
+        const columns: AnnotatedImage[][] = Array.from(
+            Array(columnCount),
+            () => []
+        );
         const columnHeights = Array.from(columns, () => 0);
 
         // Scale all images to the same width to make heights comparable.
@@ -29,7 +32,7 @@
         for (const image of images) {
             if (!image) continue;
 
-            const { img, starred, idx, loadedIdx } = image;
+            const { img } = image;
 
             const indexOfShortestColumn = columnHeights.indexOf(
                 Math.min.apply(Math, columnHeights)
@@ -38,7 +41,7 @@
             const scaleFactor = scaledImageWidth / img.width;
             const scaledImageHeight = img.height * scaleFactor;
 
-            columns[indexOfShortestColumn].push({ starred, idx, loadedIdx });
+            columns[indexOfShortestColumn].push(image);
             // TODO: This might cause overflow issues.
             columnHeights[indexOfShortestColumn] += scaledImageHeight;
         }

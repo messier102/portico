@@ -5,9 +5,12 @@
     import { sineInOut } from "svelte/easing";
 
     export let imageFeed: ImageFeed;
-    export let selectedImageIndex = null;
+    export let selectedImageIndex: number | null = null;
 
-    $: image = $imageFeed[selectedImageIndex];
+    $: image =
+        selectedImageIndex !== null
+            ? $imageFeed[selectedImageIndex]
+            : undefined;
 
     let rotationDegrees: number = 0;
     let lastScrollPos: number;
@@ -28,7 +31,7 @@
     }
 
     async function navigateToNextImage() {
-        const nextIndex = selectedImageIndex + 1;
+        const nextIndex = (selectedImageIndex as number) + 1;
         await imageFeed.at(nextIndex);
 
         // TODO: Silently reset every 360 rotation to 0 to prevent excessive spin.
@@ -39,9 +42,9 @@
     }
 
     async function navigateToPreviousImage() {
-        if (selectedImageIndex > 0) {
+        if ((selectedImageIndex as number) > 0) {
             rotationDegrees = 0;
-            selectedImageIndex -= 1;
+            selectedImageIndex = (selectedImageIndex as number) - 1;
         }
     }
 

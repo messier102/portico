@@ -5,7 +5,7 @@ export class HentsuStarboardSource implements Source<number, StarredImage[]> {
     name: string;
     baseUrl: URL;
 
-    constructor(readonly startingTimestamp?: number) {
+    constructor(readonly startingTimestamp: number | null) {
         this.name = "Hentsu starboard";
         this.baseUrl = new URL(
             "https://starboard-9xp4qxvm.ew.gateway.dev/v1/starred"
@@ -14,12 +14,12 @@ export class HentsuStarboardSource implements Source<number, StarredImage[]> {
 
     getPageUrl(pageId: number | null): URL {
         const url = new URL(this.baseUrl);
+
         if (pageId || this.startingTimestamp) {
-            url.searchParams.set(
-                "olderThan",
-                (pageId ?? this.startingTimestamp).toString()
-            );
+            const timestamp = (pageId ?? this.startingTimestamp) as number;
+            url.searchParams.set("olderThan", timestamp.toString());
         }
+
         return url;
     }
 
@@ -28,9 +28,18 @@ export class HentsuStarboardSource implements Source<number, StarredImage[]> {
             return { status: "exhausted" };
         }
 
+        const images: Image[] = response.map(
+            (image) =>
+                ({
+                    name: image.name,
+                    imageUrl: image.imageUrl,
+                    isNsfw: true,
+                } as Image)
+        );
+
         return {
             status: "success",
-            images: response as Image[],
+            images,
             nextPageId: response[response.length - 1].starredAt,
         };
     }

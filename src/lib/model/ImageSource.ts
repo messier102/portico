@@ -23,7 +23,7 @@ export interface Source<TPageId, TResponse> {
 }
 
 export class SourceStream<TPageId, TResponse> {
-    private nextPageId: TPageId = null;
+    private nextPageId: TPageId | null = null;
     private exhausted: boolean = false;
 
     constructor(private readonly source: Source<TPageId, TResponse>) {}

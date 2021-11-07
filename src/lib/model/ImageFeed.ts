@@ -27,7 +27,11 @@ export class ImageFeed {
     // between loading fast and loading in order, prioritising above-the-fold.
     // This might be dependent on resolving tasks early by prefetching dimensions.
     // Currently set to 1 because ImageModal indexing relies on loadedImages being in order.
-    private queue = new TaskQueue(1);
+    private queue = new TaskQueue<{
+        img: HTMLImageElement;
+        starred: Image;
+        idx: number;
+    }>(1);
 
     subscribe = this.loadedImages.subscribe;
 
@@ -102,10 +106,12 @@ export class ImageFeed {
         return true;
     }
 
+    // silence, machine
+    // this can't be converted to an async function
     at(index: number): Promise<AnnotatedImage> {
         let unsubscribe: Unsubscriber;
 
-        return new Promise((resolve) => {
+        return new Promise<AnnotatedImage>((resolve) => {
             unsubscribe = this.loadedImages.subscribe((images) => {
                 if (index < images.length) {
                     resolve(images[index]);
