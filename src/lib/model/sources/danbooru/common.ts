@@ -1,4 +1,4 @@
-import type { SourceResponse, Image } from "$lib/model/ImageSource";
+import { SourceResponse, InternalImage } from "$lib/model/ImageSource";
 
 type Timestamp = string;
 
@@ -82,7 +82,7 @@ export const parseDanbooruResponse = (
     const images = response
         .filter((item) => item.file_url !== null)
         .map(
-            (item): Image => ({
+            (item): InternalImage => ({
                 name: item.md5,
                 imageUrl: item.file_url,
                 isNsfw: item.rating === "e" || item.rating === "q",

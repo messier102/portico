@@ -1,5 +1,5 @@
-import type { Source } from "$lib/model/ImageSource";
-import type { DanbooruResponse } from "./common";
+import { Source } from "$lib/model/ImageSource";
+import { DanbooruResponse } from "./common";
 import { parseDanbooruResponse } from "./common";
 
 export class DanbooruPostsSource implements Source<number, DanbooruResponse> {

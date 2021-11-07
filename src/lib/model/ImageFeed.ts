@@ -1,15 +1,14 @@
 import { tick } from "svelte";
-import type { Unsubscriber, Writable } from "svelte/store";
-import { writable } from "svelte/store";
+import { writable, Unsubscriber, Writable } from "svelte/store";
 import { prefetchDimensions } from "../util/prefetchDimensions";
 import { sleepMs } from "../util/sleepMs";
 import { TaskQueue } from "../util/TaskQueue";
-import type { SourceStream, Image } from "./ImageSource";
+import { SourceStream, InternalImage } from "./ImageSource";
 
 // FIXME: Temporary grouping, need to split according to responsibility.
 export type AnnotatedImage = {
     img: HTMLImageElement;
-    starred: Image;
+    starred: InternalImage;
     idx: number;
     loadedIdx: number;
 };
@@ -18,7 +17,7 @@ export class ImageFeed {
     private isFetching: boolean = false;
     private lastFetchedAt: number = 0;
 
-    private starboardData: Image[] = [];
+    private starboardData: InternalImage[] = [];
 
     private loadedImageIdxs: Set<number> = new Set();
     private loadedImages: Writable<AnnotatedImage[]> = writable([]);
@@ -29,7 +28,7 @@ export class ImageFeed {
     // Currently set to 1 because ImageModal indexing relies on loadedImages being in order.
     private queue = new TaskQueue<{
         img: HTMLImageElement;
-        starred: Image;
+        starred: InternalImage;
         idx: number;
     }>(1);
 

@@ -1,4 +1,4 @@
-import type { Image, SourceResponse } from "$lib/model/ImageSource";
+import { InternalImage, SourceResponse } from "$lib/model/ImageSource";
 
 export type RedditResponse = RedditListing | RedditStatus;
 
@@ -164,7 +164,7 @@ export function parseRedditResponse(
     }
 
     const images = response.data.children.map(
-        ({ data }): Image => ({
+        ({ data }): InternalImage => ({
             name: data.title,
             imageUrl: data.url,
             isNsfw: data.over_18,

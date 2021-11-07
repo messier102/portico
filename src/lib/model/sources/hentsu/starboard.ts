@@ -1,5 +1,5 @@
-import type { Source, SourceResponse, Image } from "$lib/model/ImageSource";
-import type { StarredImage } from "./common";
+import { Source, SourceResponse, InternalImage } from "$lib/model/ImageSource";
+import { StarredImage } from "./common";
 
 export class HentsuStarboardSource implements Source<number, StarredImage[]> {
     name: string;
@@ -28,13 +28,13 @@ export class HentsuStarboardSource implements Source<number, StarredImage[]> {
             return { status: "exhausted" };
         }
 
-        const images: Image[] = response.map(
+        const images: InternalImage[] = response.map(
             (image) =>
                 ({
                     name: image.name,
                     imageUrl: image.imageUrl,
                     isNsfw: true,
-                } as Image)
+                } as InternalImage)
         );
 
         return {

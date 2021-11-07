@@ -1,6 +1,6 @@
 <script lang="ts">
     import { swipeable, SwipeEvent } from "../actions/swipeable";
-    import type { ImageFeed } from "../model/ImageFeed";
+    import { ImageFeed } from "../model/ImageFeed";
     import { fade } from "svelte/transition";
     import { sineInOut } from "svelte/easing";
 

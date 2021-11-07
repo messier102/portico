@@ -1,5 +1,5 @@
 import { writable } from "svelte/store";
-import type { Writable } from "svelte/store";
+import { Writable } from "svelte/store";
 
 export function persisted<T>(key: string, initial: T): Writable<T> {
     const previousValueStr = window.localStorage.getItem(key);

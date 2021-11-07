@@ -1,6 +1,6 @@
 <script lang="ts">
     import { createEventDispatcher } from "svelte";
-    import type { AnnotatedImage } from "../model/ImageFeed";
+    import { AnnotatedImage } from "../model/ImageFeed";
     import ImageTile from "./ImageTile.svelte";
     import { fly } from "svelte/transition";
 

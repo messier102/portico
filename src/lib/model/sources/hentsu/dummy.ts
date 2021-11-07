@@ -1,5 +1,5 @@
-import type { Source, SourceResponse, Image } from "$lib/model/ImageSource";
-import type { StarredImage } from "./common";
+import { Source, SourceResponse, InternalImage } from "$lib/model/ImageSource";
+import { StarredImage } from "./common";
 
 export class HentsuDummySource implements Source<null, StarredImage[]> {
     name: string;
@@ -21,7 +21,7 @@ export class HentsuDummySource implements Source<null, StarredImage[]> {
     parseResponse(response: StarredImage[]): SourceResponse<null> {
         return {
             status: "success",
-            images: response as Image[],
+            images: response as InternalImage[],
             nextPageId: null,
         };
     }
