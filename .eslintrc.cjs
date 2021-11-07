@@ -7,7 +7,7 @@ module.exports = {
         "prettier",
     ],
     plugins: ["svelte3", "@typescript-eslint"],
-    ignorePatterns: ["*.cjs"],
+    ignorePatterns: ["*.cjs", "svelte.config.js"],
     overrides: [{ files: ["*.svelte"], processor: "svelte3/svelte3" }],
     settings: {
         "svelte3/typescript": () => require("typescript"),
@@ -17,7 +17,7 @@ module.exports = {
         sourceType: "module",
         ecmaVersion: 2019,
         tsconfigRootDir: __dirname,
-        extraFileExtensions: [".svelte"]
+        extraFileExtensions: [".svelte"],
     },
     env: {
         browser: true,
