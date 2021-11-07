@@ -16,6 +16,8 @@ module.exports = {
         project: ["tsconfig.json"],
         sourceType: "module",
         ecmaVersion: 2019,
+        tsconfigRootDir: __dirname,
+        extraFileExtensions: [".svelte"]
     },
     env: {
         browser: true,

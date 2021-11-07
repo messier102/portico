@@ -1,5 +1,7 @@
 <script lang="ts" context="module">
-    export async function load() {
+    import type { LoadOutput } from "@sveltejs/kit";
+
+    export async function load(): Promise<LoadOutput> {
         const minTimestamp = 1593860599394; // first item on the starboard
         const maxTimestamp = Date.now();
         const range = maxTimestamp - minTimestamp;

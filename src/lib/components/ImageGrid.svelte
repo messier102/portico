@@ -30,7 +30,7 @@
         const scaledImageWidth = 1000;
 
         for (const image of images) {
-            if (!image) continue;
+            if (image === null) continue;
 
             const { img } = image;
 

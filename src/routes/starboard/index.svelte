@@ -5,7 +5,7 @@
 
     const query = $page.query;
     const before = query.get("before");
-    const startingTimestamp = before ? Number.parseInt(before) : null;
+    const startingTimestamp = before !== null ? Number.parseInt(before) : null;
 
     const imageSource = new HentsuStarboardSource(startingTimestamp);
 </script>

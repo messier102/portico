@@ -15,7 +15,7 @@
     let rotationDegrees: number = 0;
     let lastScrollPos: number;
 
-    export function openModal(idx: number) {
+    export function openModal(idx: number): void {
         selectedImageIndex = idx;
         lastScrollPos = document.documentElement.scrollTop;
         document.documentElement.style.position = "fixed";
