@@ -6,7 +6,7 @@ function swipeEvent(direction: Direction): SwipeEvent {
     return new CustomEvent("swipe", { detail: { direction } });
 }
 
-export function swipeable(node: HTMLElement) {
+export function swipeable(node: HTMLElement): { destroy(): void } {
     let startX = 0;
     let startY = 0;
 

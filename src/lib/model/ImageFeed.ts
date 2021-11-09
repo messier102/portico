@@ -1,15 +1,14 @@
 import { tick } from "svelte";
-import type { Unsubscriber, Writable } from "svelte/store";
-import { writable } from "svelte/store";
+import { writable, Unsubscriber, Writable } from "svelte/store";
 import { prefetchDimensions } from "../util/prefetchDimensions";
 import { sleepMs } from "../util/sleepMs";
 import { TaskQueue } from "../util/TaskQueue";
-import type { SourceStream, Image } from "./ImageSource";
+import { SourceStream, InternalImage } from "./ImageSource";
 
 // FIXME: Temporary grouping, need to split according to responsibility.
 export type AnnotatedImage = {
     img: HTMLImageElement;
-    starred: Image;
+    starred: InternalImage;
     idx: number;
     loadedIdx: number;
 };
@@ -18,7 +17,7 @@ export class ImageFeed {
     private isFetching: boolean = false;
     private lastFetchedAt: number = 0;
 
-    private starboardData: Image[] = [];
+    private starboardData: InternalImage[] = [];
 
     private loadedImageIdxs: Set<number> = new Set();
     private loadedImages: Writable<AnnotatedImage[]> = writable([]);
@@ -27,7 +26,11 @@ export class ImageFeed {
     // between loading fast and loading in order, prioritising above-the-fold.
     // This might be dependent on resolving tasks early by prefetching dimensions.
     // Currently set to 1 because ImageModal indexing relies on loadedImages being in order.
-    private queue = new TaskQueue(1);
+    private queue = new TaskQueue<{
+        img: HTMLImageElement;
+        starred: InternalImage;
+        idx: number;
+    }>(1);
 
     subscribe = this.loadedImages.subscribe;
 
@@ -102,10 +105,12 @@ export class ImageFeed {
         return true;
     }
 
+    // silence, machine
+    // this can't be converted to an async function
     at(index: number): Promise<AnnotatedImage> {
         let unsubscribe: Unsubscriber;
 
-        return new Promise((resolve) => {
+        return new Promise<AnnotatedImage>((resolve) => {
             unsubscribe = this.loadedImages.subscribe((images) => {
                 if (index < images.length) {
                     resolve(images[index]);

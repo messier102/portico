@@ -1,7 +1,7 @@
 <script lang="ts">
-    import type { Image } from "../model/ImageSource";
+    import { InternalImage } from "../model/ImageSource";
 
-    export let starred: Image;
+    export let starred: InternalImage;
     export let showNsfw: boolean;
     export let idx: number;
     export let loadedIdx: number;

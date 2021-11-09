@@ -1,5 +1,5 @@
-import type { Source } from "$lib/model/ImageSource";
-import type { RedditResponse } from "./common";
+import { Source } from "$lib/model/ImageSource";
+import { RedditResponse } from "./common";
 import { getRedditPageUrl, parseRedditResponse } from "./common";
 
 export class RedditCustomFeedSource implements Source<string, RedditResponse> {

@@ -4,7 +4,9 @@
     export let showIndex: boolean;
     export let showNsfw: boolean;
 
-    $: columnCounts = [...Array(maxColumnCount + 1 || 3).keys()].slice(1);
+    $: columnCounts = [
+        ...Array(!isNaN(maxColumnCount) ? maxColumnCount + 1 : 3).keys(),
+    ].slice(1);
 </script>
 
 <div class="wrapper">

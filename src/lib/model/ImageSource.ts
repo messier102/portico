@@ -1,11 +1,11 @@
-export type Image = {
+export type InternalImage = {
     name: string;
     imageUrl: string;
     isNsfw: boolean;
 };
 
 export type SourceResponse<TPageId> =
-    | { status: "success"; images: Image[]; nextPageId: TPageId | null }
+    | { status: "success"; images: InternalImage[]; nextPageId: TPageId | null }
     | { status: "exhausted" }
     | { status: "invalid" };
 
@@ -23,12 +23,12 @@ export interface Source<TPageId, TResponse> {
 }
 
 export class SourceStream<TPageId, TResponse> {
-    private nextPageId: TPageId = null;
+    private nextPageId: TPageId | null = null;
     private exhausted: boolean = false;
 
     constructor(private readonly source: Source<TPageId, TResponse>) {}
 
-    async fetchNextPage(): Promise<Image[]> {
+    async fetchNextPage(): Promise<InternalImage[]> {
         if (this.exhausted) {
             return [];
         }
