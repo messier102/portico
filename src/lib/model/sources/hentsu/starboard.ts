@@ -8,7 +8,7 @@ export class HentsuStarboardSource implements Source<number, StarredImage[]> {
     constructor(readonly startingTimestamp: number | null) {
         this.name = "Hentsu starboard";
         this.baseUrl = new URL(
-            "https://starboard-9xp4qxvm.ew.gateway.dev/v1/starred"
+            "https://hentsu.tskoll.com/api/v1/starboard/starred"
         );
     }
 
