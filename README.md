@@ -1,26 +1,94 @@
-# create-svelte
+# Portico
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte);
+Portico is a source-agnostic infinite-scrolling media gallery. It can be
+used to easily browse Reddit, Danbooru, and other sites.
 
-## Creating a project
+It is based around a system of adapters - small components that perform two core
+functions:
+1. Fetch media from a source in a way the source understands; and
+2. Convert fetched data into an internal Portico format.
 
-If you're seeing this, you've probably already done this step. Congrats!
+Portico can be used with any appropriately adapted source, and will provide the
+same baseline user experience for all sources.
 
-```bash
-# create a new project in the current directory
-npm init svelte@next
+A live version is currently hosted at https://portico.tskoll.com.
 
-# create a new project in my-app
-npm init svelte@next my-app
-```
+(**Note:** videos are currently not supported - only images and gifs.)
 
-> Note: the `@next` is temporary
+## Screenshots
+
+![Main view screenshot](/assets/screenshot.jpg)
+
+![Lightbox screenshot](/assets/lightbox_screenshot.png)
+
+## Controls
+
+### In lightbox mode
+- `A` or `left arrow` or `swipe down` - go to previous image.
+- `D` or `right arrow` or `swipe up` - go to next image.
+- `Q` - rotate the image 90 degrees counter-clockwise.
+- `E` - rotate the image 90 degrees clockwise.
+- `Esc` or `click` or `tap` - exit lightbox mode.
+
+## Supported sources
+
+### Reddit
+#### Paths
+- `/r/{subreddit}`
+- `/r/{subreddit1}+{subreddit2}+...`
+- `/u/{user}/{feed}` - for custom feeds.
+
+#### Query parameters
+- None.
+
+#### Notes
+- Rate limit of up to 300 page fetches every 10 minutes across all subreddits.
+
+### Danbooru posts
+#### Paths
+- `/danbooru`
+
+#### Query parameters
+- `tags={tag1 tag2}` - filters images by provided tags; space separated.
+- `random` - each page shows a random sample of images. May contain repeats.
+
+#### Notes
+- Up to two tags per query. Some tags don't count towards the limit -
+  see [Danbooru
+  documentation](https://danbooru.donmai.us/wiki_pages/help%3Acheatsheet#dtext-n5)
+  for details.
+- Up to 1000 pages per query.
+
+
+### Danbooru boards
+#### Paths
+- `/danbooru/curated`
+- `/danbooru/popular`
+- `/danbooru/viewed`
+
+#### Query parameters
+- `scale={day,month,year}` - sets the time scope of the board.
+- `date={YYYY-MM-DD}` - shows a board for a certain date. If `scale` is set to
+  `month`, will show images for the *calendar* month `MM`; same for `year`.
+
+### Hentsu starboard <span style="color: orange">**(NSFW)**</span>
+#### Paths
+- `/starboard`
+- `/starboard/random` - redirects to `/starboard?before={randomTimestamp}`
+
+#### Query parameters
+- `before={timestamp}` - sets the starting offset.
+
+#### Notes
+- Oldest valid timestamp is `1593860599395`.
+- Due to uneven distribution, `/random` tends to result in the same set of
+  images near the beginning of the collection.
+
 
 ## Developing
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
 ```bash
+npm install
 npm run dev
 
 # or start the server and open the app in a new browser tab
@@ -29,10 +97,8 @@ npm run dev -- --open
 
 ## Building
 
-Before creating a production version of your app, install an [adapter](https://kit.svelte.dev/docs#adapters) for your target environment. Then:
-
 ```bash
 npm run build
 ```
 
-> You can preview the built app with `npm run preview`, regardless of whether you installed an adapter. This should _not_ be used to serve your app in production.
+> You can preview the built app with `npm run preview`.
