@@ -45,6 +45,8 @@ export class TaskQueue<T> {
             return;
         }
 
+        // FIXME: why are we running the task before checking its generation?
+        // Should be the other way around (or rather, check on both ends).
         task.run()
             .then((value) =>
                 task.generation === this.generation

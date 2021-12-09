@@ -1,7 +1,6 @@
 import { tick } from "svelte";
 import { writable, Unsubscriber, Writable } from "svelte/store";
 import { prefetchDimensions } from "../util/prefetchDimensions";
-import { sleepMs } from "../util/sleepMs";
 import { TaskQueue } from "../util/TaskQueue";
 import { SourceStream, InternalImage } from "./ImageSource";
 
@@ -15,7 +14,6 @@ export type AnnotatedImage = {
 
 export class ImageFeed {
     private isFetching: boolean = false;
-    private lastFetchedAt: number = 0;
 
     private starboardData: InternalImage[] = [];
 
@@ -42,20 +40,11 @@ export class ImageFeed {
     constructor(private readonly source: SourceStream<unknown, unknown>) {}
 
     async fetchNext(): Promise<boolean> {
-        // TODO: prevent fetching until all images have loaded
-        // as opposed to a dumb timeout
         if (this.isFetching) {
             return false;
         }
 
         this.isFetching = true;
-
-        const waitTime = this.lastFetchedAt + 5000 - Date.now();
-
-        if (waitTime > 0) {
-            await sleepMs(waitTime);
-        }
-        this.lastFetchedAt = Date.now();
 
         const moreImagesFiltered = await this.source.fetchNextPage();
         this.starboardData = [...this.starboardData, ...moreImagesFiltered];
