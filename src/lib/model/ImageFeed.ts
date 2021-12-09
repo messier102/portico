@@ -13,6 +13,8 @@ export type AnnotatedImage = {
 };
 
 export class ImageFeed {
+    exhausted: boolean = false;
+
     private isFetching: boolean = false;
 
     private starboardData: InternalImage[] = [];
@@ -53,6 +55,12 @@ export class ImageFeed {
 
     private async fetchNext(): Promise<void> {
         const moreImagesFiltered = await this.source.fetchNextPage();
+        
+        if (moreImagesFiltered.length === 0) {
+            this.exhausted = true;
+            return;
+        }
+
         this.starboardData = [...this.starboardData, ...moreImagesFiltered];
 
         const indexedImages = this.starboardData.map((starred, idx) => ({
