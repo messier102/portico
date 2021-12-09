@@ -25,7 +25,7 @@ export class ImageFeed {
     // This might be dependent on resolving tasks early by prefetching dimensions.
     // Currently set to 1 because ImageModal indexing relies on loadedImages
     // being in order.
-    // 
+    //
     // TODO: Increasing the number of concurrent downloads can potentially save around
     // 3 seconds of overhead per fetch, but we would need the infrastructure to
     // preserve resulting image order.
@@ -39,13 +39,19 @@ export class ImageFeed {
 
     constructor(private readonly source: SourceStream<unknown, unknown>) {}
 
-    async fetchNext(): Promise<boolean> {
+    async requestFetch(): Promise<void> {
+        // Ensure there's only one fetch running at any given moment.
         if (this.isFetching) {
-            return false;
+            return;
         }
-
         this.isFetching = true;
 
+        await this.fetchNext();
+
+        this.isFetching = false;
+    }
+
+    private async fetchNext(): Promise<void> {
         const moreImagesFiltered = await this.source.fetchNextPage();
         this.starboardData = [...this.starboardData, ...moreImagesFiltered];
 
@@ -95,9 +101,6 @@ export class ImageFeed {
 
         await this.queue.flushed();
         await tick();
-
-        this.isFetching = false;
-        return true;
     }
 
     // silence, machine
@@ -110,7 +113,7 @@ export class ImageFeed {
                 if (index < images.length) {
                     resolve(images[index]);
                 } else {
-                    this.fetchNext();
+                    this.requestFetch();
                 }
             });
         }).then((e: AnnotatedImage) => {

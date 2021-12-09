@@ -36,7 +36,7 @@
 
         while (needToFetchImages()) {
             console.log("Fetching more images");
-            await imageFeed.fetchNext();
+            await imageFeed.requestFetch();
             await tick();
         }
 
@@ -45,7 +45,7 @@
 
     async function handleScroll() {
         if (needToFetchImages()) {
-            await imageFeed.fetchNext();
+            await imageFeed.requestFetch();
         }
     }
 
