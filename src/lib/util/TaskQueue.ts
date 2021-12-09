@@ -11,13 +11,14 @@ export class TaskQueue<T> {
     private queue: Task<T>[] = [];
     private openSlots: number;
     private generation: number = 0;
+    private lastPromise: Promise<T> | null = null;
 
     constructor(maxConcurrentTasks: number) {
         this.openSlots = maxConcurrentTasks;
     }
 
     enqueue(run: DeferredPromise<T>): Promise<T> {
-        return new Promise((resolve, reject) => {
+        this.lastPromise = new Promise((resolve, reject) => {
             this.queue.push({
                 run,
                 resolve,
@@ -26,6 +27,8 @@ export class TaskQueue<T> {
             });
             this.dequeue();
         });
+
+        return this.lastPromise;
     }
 
     dequeue(): void {
@@ -42,6 +45,8 @@ export class TaskQueue<T> {
             return;
         }
 
+        // FIXME: why are we running the task before checking its generation?
+        // Should be the other way around (or rather, check on both ends).
         task.run()
             .then((value) =>
                 task.generation === this.generation
@@ -53,6 +58,10 @@ export class TaskQueue<T> {
                 this.openSlots++;
                 this.dequeue();
             });
+    }
+
+    async flushed(): Promise<void> {
+        await this.lastPromise;
     }
 
     clear(): void {

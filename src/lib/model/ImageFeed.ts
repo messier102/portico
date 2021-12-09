@@ -1,7 +1,6 @@
 import { tick } from "svelte";
 import { writable, Unsubscriber, Writable } from "svelte/store";
 import { prefetchDimensions } from "../util/prefetchDimensions";
-import { sleepMs } from "../util/sleepMs";
 import { TaskQueue } from "../util/TaskQueue";
 import { SourceStream, InternalImage } from "./ImageSource";
 
@@ -15,7 +14,6 @@ export type AnnotatedImage = {
 
 export class ImageFeed {
     private isFetching: boolean = false;
-    private lastFetchedAt: number = 0;
 
     private starboardData: InternalImage[] = [];
 
@@ -25,7 +23,12 @@ export class ImageFeed {
     // From empirical testing, 2 concurrent tasks seems to strike a good balance
     // between loading fast and loading in order, prioritising above-the-fold.
     // This might be dependent on resolving tasks early by prefetching dimensions.
-    // Currently set to 1 because ImageModal indexing relies on loadedImages being in order.
+    // Currently set to 1 because ImageModal indexing relies on loadedImages
+    // being in order.
+    //
+    // TODO: Increasing the number of concurrent downloads can potentially save around
+    // 3 seconds of overhead per fetch, but we would need the infrastructure to
+    // preserve resulting image order.
     private queue = new TaskQueue<{
         img: HTMLImageElement;
         starred: InternalImage;
@@ -36,22 +39,19 @@ export class ImageFeed {
 
     constructor(private readonly source: SourceStream<unknown, unknown>) {}
 
-    async fetchNext(): Promise<boolean> {
-        // TODO: prevent fetching until all images have loaded
-        // as opposed to a dumb timeout
+    async requestFetch(): Promise<void> {
+        // Ensure there's only one fetch running at any given moment.
         if (this.isFetching) {
-            return false;
+            return;
         }
-
         this.isFetching = true;
 
-        const waitTime = this.lastFetchedAt + 5000 - Date.now();
+        await this.fetchNext();
 
-        if (waitTime > 0) {
-            await sleepMs(waitTime);
-        }
-        this.lastFetchedAt = Date.now();
+        this.isFetching = false;
+    }
 
+    private async fetchNext(): Promise<void> {
         const moreImagesFiltered = await this.source.fetchNextPage();
         this.starboardData = [...this.starboardData, ...moreImagesFiltered];
 
@@ -99,10 +99,8 @@ export class ImageFeed {
                 );
         }
 
+        await this.queue.flushed();
         await tick();
-
-        this.isFetching = false;
-        return true;
     }
 
     // silence, machine
@@ -115,7 +113,7 @@ export class ImageFeed {
                 if (index < images.length) {
                     resolve(images[index]);
                 } else {
-                    this.fetchNext();
+                    this.requestFetch();
                 }
             });
         }).then((e: AnnotatedImage) => {

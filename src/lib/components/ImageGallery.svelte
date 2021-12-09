@@ -22,19 +22,30 @@
 
     let openModal: (idx: number) => void;
 
-    onMount(async () => {
-        await tick();
-        await imageFeed.fetchNext();
-    });
-
-    async function handleScroll() {
+    function needToFetchImages() {
         const { scrollTop, scrollHeight, clientHeight } =
             document.documentElement;
 
         const scrolledToBottom = scrollTop + clientHeight >= scrollHeight - 100;
 
-        if (scrolledToBottom) {
-            await imageFeed.fetchNext();
+        return scrolledToBottom;
+    }
+
+    onMount(async () => {
+        await tick();
+
+        while (needToFetchImages()) {
+            console.log("Fetching more images");
+            await imageFeed.requestFetch();
+            await tick();
+        }
+
+        console.log("Done fetching");
+    });
+
+    async function handleScroll() {
+        if (needToFetchImages()) {
+            await imageFeed.requestFetch();
         }
     }
 
