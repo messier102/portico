@@ -25,7 +25,12 @@ export class ImageFeed {
     // From empirical testing, 2 concurrent tasks seems to strike a good balance
     // between loading fast and loading in order, prioritising above-the-fold.
     // This might be dependent on resolving tasks early by prefetching dimensions.
-    // Currently set to 1 because ImageModal indexing relies on loadedImages being in order.
+    // Currently set to 1 because ImageModal indexing relies on loadedImages
+    // being in order.
+    // 
+    // TODO: Increasing the number of concurrent downloads can potentially save around
+    // 3 seconds of overhead per fetch, but we would need the infrastructure to
+    // preserve resulting image order.
     private queue = new TaskQueue<{
         img: HTMLImageElement;
         starred: InternalImage;
@@ -99,6 +104,7 @@ export class ImageFeed {
                 );
         }
 
+        await this.queue.flushed();
         await tick();
 
         this.isFetching = false;
