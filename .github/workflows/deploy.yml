@@ -44,5 +44,5 @@ jobs:
                   REMOTE_DIR: "~/portico/"
               run: >
                   rsync -avzr --delete
-                  -e "ssh -i ~/.ssh/deploy -o StrictHostKeyChecking=no"
+                  -e "ssh -i ~/.ssh/deploy"
                   ${LOCAL_DIR} ${PROD_USER}@${PROD_HOST_IP}:${REMOTE_DIR}
