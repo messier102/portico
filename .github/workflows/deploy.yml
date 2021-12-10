@@ -1,0 +1,48 @@
+name: Build and deploy to production
+
+on:
+    push:
+        branches:
+            - main
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: actions/checkout@v2
+
+            - uses: actions/setup-node@v2
+              with:
+                  node-version: 16
+
+            - name: Build
+              run: |
+                  npm ci
+                  npm run build
+                  echo '{"type": "module"}' > build/package.json
+
+            - name: Add deployment server to known hosts
+              env:
+                  PROD_HOST_IP: ${{ secrets.PROD_HOST_IP }}
+              run: |
+                  mkdir -p ~/.ssh
+                  ssh-keyscan -H "$PROD_HOST_IP" > ~/.ssh/known_hosts
+
+            - name: Add SSH key
+              env:
+                  SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+              run: |
+                  echo "$SSH_PRIVATE_KEY" > ~/.ssh/deploy
+                  chmod 600 ~/.ssh/deploy
+
+            - name: Deploy
+              env:
+                  PROD_HOST_IP: ${{ secrets.PROD_HOST_IP }}
+                  PROD_USER: ${{ secrets.PROD_USER }}
+                  LOCAL_DIR: "build/"
+                  REMOTE_DIR: "~/portico/"
+              run: >
+                  rsync -avzr --delete
+                  -e "ssh -i ~/.ssh/deploy -o StrictHostKeyChecking=no"
+                  ${LOCAL_DIR} ${PROD_USER}@${PROD_HOST_IP}:${REMOTE_DIR}
