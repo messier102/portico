@@ -5,12 +5,9 @@
     import { DanbooruExploreSource } from "$lib/model/sources/danbooru/explore";
 
     const date = $page.query.get("date");
-    const scale = $page.query.get("scale");
-    const imageSource = new DanbooruExploreSource(
-        "viewed",
-        date,
-        scale as "day" | "week" | "month"
-    );
+
+    // `/viewed` board does not support the `scale` parameter, always set to day
+    const imageSource = new DanbooruExploreSource("viewed", date, null);
 </script>
 
 <ImageGallery {imageSource} />
