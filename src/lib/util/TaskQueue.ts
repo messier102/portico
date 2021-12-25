@@ -61,7 +61,10 @@ export class TaskQueue<T> {
     }
 
     async flushed(): Promise<void> {
-        await this.lastPromise;
+        await this.lastPromise?.catch(() => {
+            // We only care if the queue has been flushed here.
+            // Error handling must be done on promises returned by enqueue().
+        });
     }
 
     clear(): void {
