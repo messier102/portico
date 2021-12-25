@@ -9,7 +9,7 @@
     const imageSource = new DanbooruExploreSource(
         "viewed",
         date,
-        scale as "day" | "month" | "year"
+        scale as "day" | "week" | "month"
     );
 </script>
 

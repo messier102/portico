@@ -9,7 +9,7 @@ export class DanbooruExploreSource implements Source<number, DanbooruResponse> {
     constructor(
         type: "popular" | "curated" | "viewed",
         date: string | null,
-        scale: "day" | "month" | "year" | null
+        scale: "day" | "week" | "month" | null
     ) {
         this.name = `Danbooru ${type}`;
         this.baseUrl = new URL(
