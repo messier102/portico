@@ -55,7 +55,7 @@ export class ImageFeed {
 
     private async fetchNext(): Promise<void> {
         const moreImagesFiltered = await this.source.fetchNextPage();
-        
+
         if (moreImagesFiltered.length === 0) {
             this.exhausted = true;
             return;
