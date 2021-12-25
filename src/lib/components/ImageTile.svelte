@@ -22,7 +22,7 @@
 
     {#if showIndex}
         <h1 class="index overlay">
-            {idx}/{loadedIdx}
+            {loadedIdx}
         </h1>
     {/if}
 
@@ -66,7 +66,7 @@
     }
 
     .index {
-        font-size: 48px;
+        font-size: 72px;
         text-shadow: 0 0 5px black;
 
         display: flex;
