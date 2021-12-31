@@ -5,7 +5,10 @@ export class HentsuStarboardSource implements Source<number, StarredImage[]> {
     name: string;
     baseUrl: URL;
 
-    constructor(readonly startingTimestamp: number | null) {
+    constructor(
+        readonly startingTimestamp: number | null,
+        readonly starredBy: string | null
+    ) {
         this.name = "Hentsu starboard";
         this.baseUrl = new URL(
             "https://hentsu.tskoll.com/api/v1/starboard/starred"
@@ -18,6 +21,10 @@ export class HentsuStarboardSource implements Source<number, StarredImage[]> {
         if (pageId !== null || this.startingTimestamp !== null) {
             const timestamp = (pageId ?? this.startingTimestamp) as number;
             url.searchParams.set("olderThan", timestamp.toString());
+        }
+
+        if (this.starredBy !== null) {
+            url.searchParams.set("starredBy", this.starredBy);
         }
 
         return url;
