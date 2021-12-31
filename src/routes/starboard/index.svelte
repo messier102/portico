@@ -7,7 +7,9 @@
     const before = query.get("before");
     const startingTimestamp = before !== null ? Number.parseInt(before) : null;
 
-    const imageSource = new HentsuStarboardSource(startingTimestamp);
+    const starredBy = query.get("starredBy");
+
+    const imageSource = new HentsuStarboardSource(startingTimestamp, starredBy);
 </script>
 
 <ImageGallery {imageSource} />
