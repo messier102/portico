@@ -8,7 +8,7 @@ export class RedditCustomFeedSource implements Source<string, RedditResponse> {
 
     constructor(user: string, feed: string) {
         this.name = `r/${user}/${feed}`;
-        this.baseUrl = new URL(`https://www.reddit.com/u/${user}/m/${feed}.json`);
+        this.baseUrl = new URL(`https://www.reddit.com/user/${user}/m/${feed}/new.json`);
     }
 
     getPageUrl(pageId: string): URL {
