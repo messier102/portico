@@ -1,8 +1,11 @@
 <script lang="ts">
+    import { Source } from "$lib/model/ImageSource";
+
     export let columnCount: number;
     export let maxColumnCount: number;
     export let showIndex: boolean;
     export let showNsfw: boolean;
+    export let imageSource: Source<unknown, unknown>;
 
     $: columnCounts = [
         ...Array(!isNaN(maxColumnCount) ? maxColumnCount + 1 : 3).keys(),
@@ -11,6 +14,9 @@
 
 <div class="wrapper">
     <div class="control-panel">
+        <div>
+            {imageSource.name}
+        </div>
         <div class="column-count">
             <select bind:value={columnCount}>
                 {#each columnCounts as count}

@@ -75,6 +75,7 @@
         bind:columnCount={$columnCount}
         bind:showIndex={$showIndex}
         bind:showNsfw={$showNsfw}
+        bind:imageSource
     />
 
     <ImageViewModal {imageFeed} bind:openModal />
