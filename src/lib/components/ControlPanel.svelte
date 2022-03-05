@@ -14,7 +14,7 @@
 
 <div class="wrapper">
     <div class="control-panel">
-        <div>
+        <div class="source-name">
             {imageSource.name}
         </div>
         <div class="column-count">
@@ -40,48 +40,30 @@
 <style>
     .wrapper {
         position: fixed;
-        bottom: 12px;
-        width: 100%;
+        bottom: 0;
+        width: 100vw;
         z-index: 2;
         display: flex;
         flex-flow: row nowrap;
-        justify-content: center;
-    }
-
-    @media screen and (min-width: 720px) {
-        .wrapper {
-            right: 30px;
-            justify-content: right;
-        }
-
-        .control-panel {
-            opacity: 0.7;
-        }
+        justify-content: space-between;
     }
 
     .control-panel {
-        padding: 0 8px;
         display: flex;
+        width: 100%;
         align-items: center;
-        border-radius: 12px;
-        box-shadow: 0 1px 8px rgba(0, 0, 0, 0.6);
+        justify-content: space-evenly;
         height: 52px;
-        background-color: #223;
-        transition: 0.2s ease;
-        gap: 8px;
+        background-color: #111;
     }
 
-    .control-panel:hover {
-        opacity: 1;
+    .source-name {
+        font-weight: 600;
     }
 
     select {
         margin: 0;
-        border-radius: 10px;
-        color: white;
-        background-color: #334;
         border: none;
-        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
     }
 
     input {
