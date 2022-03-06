@@ -14,39 +14,26 @@
 
 <div class="wrapper">
     <div class="control-panel">
-        <div class="expand-dong">
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                fill="currentColor"
-                class="bi bi-chevron-up"
-                viewBox="0 0 16 16"
-            >
-                <path
-                    fill-rule="evenodd"
-                    d="M7.646 4.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 5.707l-5.646 5.647a.5.5 0 0 1-.708-.708l6-6z"
-                />
-            </svg>
-        </div>
-        <div class="foo">
+        <div class="bar">
+            <img class="expand-dong" src="/chevron-up.svg" alt="Expand menu" />
+
             <div class="source-name">
                 {imageSource.name}
             </div>
+        </div>
 
-            <div class="quick-actions">
-                <select bind:value={columnCount}>
-                    {#each columnCounts as count}
-                        <option value={count}>{count}</option>
-                    {/each}
-                </select>
+        <div class="quick-actions">
+            <select bind:value={columnCount}>
+                {#each columnCounts as count}
+                    <option value={count}>{count}</option>
+                {/each}
+            </select>
 
-                <input type="checkbox" id="index" bind:checked={showIndex} />
-                <label for="index" />
+            <input type="checkbox" id="index" bind:checked={showIndex} />
+            <label for="index" />
 
-                <input type="checkbox" id="nsfw" bind:checked={showNsfw} />
-                <label for="nsfw" />
-            </div>
+            <input type="checkbox" id="nsfw" bind:checked={showNsfw} />
+            <label for="nsfw" />
         </div>
     </div>
 </div>
@@ -65,6 +52,7 @@
     .control-panel {
         display: flex;
         padding-right: 8px;
+        justify-content: space-between;
         width: 100%;
         align-items: center;
         height: 44px;
@@ -72,21 +60,21 @@
     }
 
     .expand-dong {
-        width: 42px;
-        height: 100%;
+        width: 24px;
+        margin: 8px;
         display: flex;
         justify-content: center;
         align-items: center;
+        filter: invert();
     }
 
     .source-name {
         font-weight: 600;
+        margin-bottom: 2px;
     }
 
-    .foo {
+    .bar {
         display: flex;
-        width: 100%;
-        justify-content: space-between;
         align-items: center;
     }
 
