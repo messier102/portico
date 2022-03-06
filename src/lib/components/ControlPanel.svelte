@@ -33,15 +33,14 @@
             <div class="source-name">
                 {imageSource.name}
             </div>
-            <!-- <div class="column-count">
-            <select bind:value={columnCount}>
-                {#each columnCounts as count}
-                    <option value={count}>{count}</option>
-                {/each}
-            </select>
-        </div>
-    -->
-            <div>
+
+            <div class="quick-actions">
+                <select bind:value={columnCount}>
+                    {#each columnCounts as count}
+                        <option value={count}>{count}</option>
+                    {/each}
+                </select>
+
                 <input type="checkbox" id="index" bind:checked={showIndex} />
                 <label for="index" />
 
@@ -89,6 +88,22 @@
         width: 100%;
         justify-content: space-between;
         align-items: center;
+    }
+
+    .quick-actions {
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
+        gap: 12px;
+    }
+
+    select {
+        margin: 0;
+        height: 44px;
+        width: 44px;
+        background-color: #222;
+        border: none;
+        border-radius: 0;
     }
 
     input[type="checkbox"] {
