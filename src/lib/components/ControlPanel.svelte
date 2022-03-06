@@ -40,14 +40,14 @@
                 {/each}
             </select>
         </div>
-
-        <div class="index-switch">
-            Index
-            <input type="checkbox" bind:checked={showIndex} />
-        </div>
     -->
-            <input type="checkbox" id="nsfw" bind:checked={showNsfw} />
-            <label for="nsfw" />
+            <div>
+                <input type="checkbox" id="index" bind:checked={showIndex} />
+                <label for="index" />
+
+                <input type="checkbox" id="nsfw" bind:checked={showNsfw} />
+                <label for="nsfw" />
+            </div>
         </div>
     </div>
 </div>
@@ -98,19 +98,25 @@
     input[type="checkbox"] + label {
         width: 24px;
         height: 24px;
-        mask-image: url("/nsfw.svg");
         background-color: rgba(255, 255, 255, 0.5);
         display: inline-block;
         transition: all 0.2s ease-in-out;
         cursor: pointer;
     }
 
-    input[type="checkbox"]:checked + label {
+    #nsfw + label {
+        mask-image: url("/nsfw.svg");
+    }
+
+    #nsfw:checked + label {
         background-color: gold;
     }
 
-    /* select {
-        margin: 0;
-        border: none;
-    } */
+    #index + label {
+        mask-image: url("/index.svg");
+    }
+
+    #index:checked + label {
+        background-color: white;
+    }
 </style>
