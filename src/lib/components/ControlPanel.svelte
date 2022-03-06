@@ -7,33 +7,49 @@
     export let showNsfw: boolean;
     export let imageSource: Source<unknown, unknown>;
 
+    let expandControlPanel: boolean = false;
+    let cpHeaderHeight = 44;
+    let cpTotalHeight = 250;
+    $: cpBottom = expandControlPanel ? 0 : cpHeaderHeight - cpTotalHeight;
+
     $: columnCounts = [
         ...Array(!isNaN(maxColumnCount) ? maxColumnCount + 1 : 3).keys(),
     ].slice(1);
 </script>
 
-<div class="wrapper">
+<div class="wrapper" style="height: {cpTotalHeight}px; bottom: {cpBottom}px">
     <div class="control-panel">
-        <div class="bar">
-            <img class="expand-dong" src="/chevron-up.svg" alt="Expand menu" />
+        <div class="cp-header" style="height: {cpHeaderHeight}px;">
+            <div class="bar">
+                <input
+                    type="checkbox"
+                    id="expand-control-panel"
+                    bind:checked={expandControlPanel}
+                />
+                <label for="expand-control-panel" />
 
-            <div class="source-name">
-                {imageSource.name}
+                <div class="source-name">
+                    {imageSource.name}
+                </div>
+            </div>
+
+            <div class="quick-actions">
+                <select bind:value={columnCount}>
+                    {#each columnCounts as count}
+                        <option value={count}>{count}</option>
+                    {/each}
+                </select>
+
+                <input type="checkbox" id="index" bind:checked={showIndex} />
+                <label for="index" />
+
+                <input type="checkbox" id="nsfw" bind:checked={showNsfw} />
+                <label for="nsfw" />
             </div>
         </div>
 
-        <div class="quick-actions">
-            <select bind:value={columnCount}>
-                {#each columnCounts as count}
-                    <option value={count}>{count}</option>
-                {/each}
-            </select>
-
-            <input type="checkbox" id="index" bind:checked={showIndex} />
-            <label for="index" />
-
-            <input type="checkbox" id="nsfw" bind:checked={showNsfw} />
-            <label for="nsfw" />
+        <div>
+            <p>Various additional settings will go here.</p>
         </div>
     </div>
 </div>
@@ -41,31 +57,25 @@
 <style>
     .wrapper {
         position: fixed;
-        bottom: 0;
         width: 100%;
         z-index: 2;
         display: flex;
         flex-flow: row nowrap;
         justify-content: space-between;
+        transition: all 0.4s ease-in-out;
+        background-color: #222;
     }
 
     .control-panel {
-        display: flex;
-        padding-right: 8px;
-        justify-content: space-between;
         width: 100%;
-        align-items: center;
-        height: 44px;
-        background-color: #111;
     }
 
-    .expand-dong {
-        width: 24px;
-        margin: 8px;
+    .cp-header {
+        width: 100%;
         display: flex;
-        justify-content: center;
+        justify-content: space-between;
         align-items: center;
-        filter: invert();
+        background-color: #111;
     }
 
     .source-name {
@@ -79,6 +89,7 @@
     }
 
     .quick-actions {
+        padding-right: 8px;
         display: flex;
         align-items: center;
         justify-content: space-around;
@@ -121,5 +132,16 @@
 
     #index:checked + label {
         background-color: white;
+    }
+
+    #expand-control-panel + label {
+        background-color: white;
+        margin: 8px;
+        mask-image: url("/chevron-up.svg");
+        transition: transform 0.4s ease-in-out;
+    }
+
+    #expand-control-panel:checked + label {
+        transform: rotate(180deg);
     }
 </style>
