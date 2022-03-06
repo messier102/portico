@@ -17,57 +17,53 @@
     ].slice(1);
 </script>
 
-<div class="wrapper" style="height: {cpTotalHeight}px; bottom: {cpBottom}px">
-    <div class="control-panel">
-        <div class="cp-header" style="height: {cpHeaderHeight}px;">
-            <div class="bar">
-                <input
-                    type="checkbox"
-                    id="expand-control-panel"
-                    bind:checked={expandControlPanel}
-                />
-                <label for="expand-control-panel" />
+<div
+    class="control-panel"
+    style="height: {cpTotalHeight}px; bottom: {cpBottom}px"
+>
+    <div class="cp-header" style="height: {cpHeaderHeight}px;">
+        <div class="cp-title">
+            <input
+                type="checkbox"
+                id="expand-control-panel"
+                bind:checked={expandControlPanel}
+            />
+            <label for="expand-control-panel" />
 
-                <div class="source-name">
-                    {imageSource.name}
-                </div>
-            </div>
-
-            <div class="quick-actions">
-                <select bind:value={columnCount}>
-                    {#each columnCounts as count}
-                        <option value={count}>{count}</option>
-                    {/each}
-                </select>
-
-                <input type="checkbox" id="index" bind:checked={showIndex} />
-                <label for="index" />
-
-                <input type="checkbox" id="nsfw" bind:checked={showNsfw} />
-                <label for="nsfw" />
+            <div class="source-name">
+                {imageSource.name}
             </div>
         </div>
 
-        <div>
-            <p>Various additional settings will go here.</p>
+        <div class="quick-actions">
+            <select bind:value={columnCount}>
+                {#each columnCounts as count}
+                    <option value={count}>{count}</option>
+                {/each}
+            </select>
+
+            <input type="checkbox" id="index" bind:checked={showIndex} />
+            <label for="index" />
+
+            <input type="checkbox" id="nsfw" bind:checked={showNsfw} />
+            <label for="nsfw" />
         </div>
+    </div>
+
+    <div>
+        <p>Various additional settings will go here.</p>
     </div>
 </div>
 
 <style>
-    .wrapper {
+    .control-panel {
         position: fixed;
         width: 100%;
         z-index: 2;
         display: flex;
-        flex-flow: row nowrap;
-        justify-content: space-between;
+        flex-flow: column nowrap;
         transition: all 0.4s ease-in-out;
         background-color: #222;
-    }
-
-    .control-panel {
-        width: 100%;
     }
 
     .cp-header {
@@ -83,7 +79,7 @@
         margin-bottom: 2px;
     }
 
-    .bar {
+    .cp-title {
         display: flex;
         align-items: center;
     }
