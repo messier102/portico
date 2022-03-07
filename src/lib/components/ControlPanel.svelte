@@ -115,6 +115,7 @@
     }
 
     #nsfw + label {
+        -webkit-mask-image: url("/nsfw.svg");
         mask-image: url("/nsfw.svg");
     }
 
@@ -123,6 +124,7 @@
     }
 
     #index + label {
+        -webkit-mask-image: url("/index.svg");
         mask-image: url("/index.svg");
     }
 
@@ -133,6 +135,7 @@
     #expand-control-panel + label {
         background-color: white;
         margin: 8px;
+        -webkit-mask-image: url("/chevron-up.svg");
         mask-image: url("/chevron-up.svg");
         transition: transform 0.4s ease-in-out;
     }
