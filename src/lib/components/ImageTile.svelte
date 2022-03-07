@@ -34,7 +34,7 @@
 <style>
     .tile {
         position: relative;
-        background-color: #223; /* for placeholder */
+        background-color: #222; /* for placeholder */
         cursor: pointer;
         /* Overflow is set to clip to preserve the sticky behavior of the image title.
         See https://github.com/w3c/csswg-drafts/issues/865 */

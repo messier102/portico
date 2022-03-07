@@ -1,84 +1,143 @@
 <script lang="ts">
+    import { Source } from "$lib/model/ImageSource";
+
     export let columnCount: number;
     export let maxColumnCount: number;
     export let showIndex: boolean;
     export let showNsfw: boolean;
+    export let imageSource: Source<unknown, unknown>;
+
+    let expandControlPanel: boolean = false;
+    let cpHeaderHeight = 44;
+    let cpTotalHeight = 250;
+    $: cpBottom = expandControlPanel ? 0 : cpHeaderHeight - cpTotalHeight;
 
     $: columnCounts = [
         ...Array(!isNaN(maxColumnCount) ? maxColumnCount + 1 : 3).keys(),
     ].slice(1);
 </script>
 
-<div class="wrapper">
-    <div class="control-panel">
-        <div class="column-count">
+<div
+    class="control-panel"
+    style="height: {cpTotalHeight}px; bottom: {cpBottom}px"
+>
+    <div class="cp-header" style="height: {cpHeaderHeight}px;">
+        <div class="cp-title">
+            <input
+                type="checkbox"
+                id="expand-control-panel"
+                bind:checked={expandControlPanel}
+            />
+            <label for="expand-control-panel" />
+
+            <div class="source-name">
+                {imageSource.name}
+            </div>
+        </div>
+
+        <div class="quick-actions">
             <select bind:value={columnCount}>
                 {#each columnCounts as count}
                     <option value={count}>{count}</option>
                 {/each}
             </select>
-        </div>
 
-        <div class="index-switch">
-            Index
-            <input type="checkbox" bind:checked={showIndex} />
-        </div>
+            <input type="checkbox" id="index" bind:checked={showIndex} />
+            <label for="index" />
 
-        <div class="nsfw-switch">
-            Show NSFW
-            <input type="checkbox" bind:checked={showNsfw} />
+            <input type="checkbox" id="nsfw" bind:checked={showNsfw} />
+            <label for="nsfw" />
         </div>
+    </div>
+
+    <div>
+        <p>Various additional settings will go here.</p>
     </div>
 </div>
 
 <style>
-    .wrapper {
+    .control-panel {
         position: fixed;
-        bottom: 12px;
         width: 100%;
         z-index: 2;
         display: flex;
-        flex-flow: row nowrap;
-        justify-content: center;
+        flex-flow: column nowrap;
+        transition: all 0.4s ease-in-out;
+        background-color: #222;
     }
 
-    @media screen and (min-width: 720px) {
-        .wrapper {
-            right: 30px;
-            justify-content: right;
-        }
-
-        .control-panel {
-            opacity: 0.7;
-        }
+    .cp-header {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: #111;
     }
 
-    .control-panel {
-        padding: 0 8px;
+    .source-name {
+        font-weight: 600;
+        margin-bottom: 2px;
+    }
+
+    .cp-title {
         display: flex;
         align-items: center;
-        border-radius: 12px;
-        box-shadow: 0 1px 8px rgba(0, 0, 0, 0.6);
-        height: 52px;
-        background-color: #223;
-        transition: 0.2s ease;
-        gap: 8px;
     }
 
-    .control-panel:hover {
-        opacity: 1;
+    .quick-actions {
+        padding-right: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
+        gap: 12px;
     }
 
     select {
         margin: 0;
-        border-radius: 10px;
-        color: white;
-        background-color: #334;
+        height: 44px;
+        width: 44px;
+        background-color: #222;
         border: none;
-        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+        border-radius: 0;
     }
 
-    input {
-        margin: 0;
+    input[type="checkbox"] {
+        display: none;
+    }
+
+    input[type="checkbox"] + label {
+        width: 24px;
+        height: 24px;
+        background-color: rgba(255, 255, 255, 0.5);
+        display: inline-block;
+        transition: all 0.2s ease-in-out;
+        cursor: pointer;
+    }
+
+    #nsfw + label {
+        mask-image: url("/nsfw.svg");
+    }
+
+    #nsfw:checked + label {
+        background-color: gold;
+    }
+
+    #index + label {
+        mask-image: url("/index.svg");
+    }
+
+    #index:checked + label {
+        background-color: white;
+    }
+
+    #expand-control-panel + label {
+        background-color: white;
+        margin: 8px;
+        mask-image: url("/chevron-up.svg");
+        transition: transform 0.4s ease-in-out;
+    }
+
+    #expand-control-panel:checked + label {
+        transform: rotate(180deg);
     }
 </style>
