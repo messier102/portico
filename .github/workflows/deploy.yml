@@ -10,17 +10,38 @@ jobs:
         runs-on: ubuntu-latest
 
         steps:
+            - name: Checkout the repository
             - uses: actions/checkout@v2
 
+            - name: Set up Node.js
             - uses: actions/setup-node@v2
               with:
                   node-version: 16
 
-            - name: Build
+            - name: Build the app
               run: |
                   npm ci
                   npm run build
-                  echo '{"type": "module"}' > build/package.json
+
+            - name: Login to Docker Hub
+              uses: docker/login-action@v1
+              with:
+                  username: ${{ secrets.DOCKER_HUB_USERNAME }}
+                  password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
+            - name: Set up Docker Buildx
+              uses: docker/setup-buildx-action@v1
+
+            - name: Build and push
+              uses: docker/build-push-action@v2
+              with:
+                  context: .
+                  file: ./Dockerfile
+                  builder: ${{ steps.buildx.outputs.name }}
+                  push: true
+                  tags: ${{ secrets.DOCKER_HUB_USERNAME }}/portico:latest
+                  cache-from: type=registry,ref=${{ secrets.DOCKER_HUB_USERNAME }}/portico:buildcache
+                  cache-to: type=registry,ref=${{ secrets.DOCKER_HUB_USERNAME }}/portico:buildcache,mode=max
 
             - name: Add deployment server to known hosts
               env:
@@ -40,9 +61,5 @@ jobs:
               env:
                   PROD_HOST_IP: ${{ secrets.PROD_HOST_IP }}
                   PROD_USER: ${{ secrets.PROD_USER }}
-                  LOCAL_DIR: "build/"
-                  REMOTE_DIR: "~/portico/"
-              run: >
-                  rsync -avzr --delete
-                  -e "ssh -i ~/.ssh/deploy"
-                  ${LOCAL_DIR} ${PROD_USER}@${PROD_HOST_IP}:${REMOTE_DIR}
+              run: |
+                  ssh -i ~/.ssh/deploy "docker service update portico"
