@@ -124,6 +124,6 @@
 
     .rotated-90 {
         height: min(100vw, calc(100vh * var(--scale)));
-        width: min(100vh, calc(100vw * var(--scale)));
+        width: max(100vh, calc(100vw * var(--scale)));
     }
 </style>
