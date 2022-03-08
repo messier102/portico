@@ -61,5 +61,6 @@ jobs:
               env:
                   PROD_HOST_IP: ${{ secrets.PROD_HOST_IP }}
                   PROD_USER: ${{ secrets.PROD_USER }}
-              run: |
-                  ssh -i ~/.ssh/deploy $PROD_USER@$PROD_HOST_IP "docker service update portico"
+              run: >
+                  ssh -i ~/.ssh/deploy $PROD_USER@$PROD_HOST_IP 
+                  "docker service update --image messier102/portico:latest portico"
