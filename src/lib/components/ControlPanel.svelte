@@ -6,6 +6,7 @@
     export let showIndex: boolean;
     export let showNsfw: boolean;
     export let autoRotate: boolean;
+    export let fullScreen: boolean;
     export let imageSource: Source<unknown, unknown>;
 
     let expandControlPanel: boolean = false;
@@ -51,6 +52,9 @@
 
             <input type="checkbox" id="nsfw" bind:checked={showNsfw} />
             <label for="nsfw" />
+
+            <input type="checkbox" id="fullscreen" bind:checked={fullScreen} />
+            <label for="fullscreen" />
         </div>
     </div>
 
@@ -142,6 +146,15 @@
     }
 
     #autorotate:checked + label {
+        background-color: white;
+    }
+
+    #fullscreen + label {
+        -webkit-mask-image: url("/fullscreen.svg");
+        mask-image: url("/fullscreen.svg");
+    }
+
+    #fullscreen:checked + label {
         background-color: white;
     }
 
