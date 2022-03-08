@@ -13,6 +13,13 @@
     const showNsfw = persisted("showNsfw", false);
     const autoRotate = persisted("autoRotate", false);
 
+    let fullScreen = false;
+    $: if (fullScreen) {
+        document.documentElement.requestFullscreen();
+    } else {
+        document.exitFullscreen();
+    }
+
     const minColumnWidth = 155;
     let clientWidth: number;
     $: maxColumnCount = Math.max(Math.floor(clientWidth / minColumnWidth), 1);
@@ -78,6 +85,7 @@
         bind:showNsfw={$showNsfw}
         bind:autoRotate={$autoRotate}
         bind:imageSource
+        bind:fullScreen
     />
 
     <ImageViewModal {imageFeed} autoRotate={$autoRotate} bind:openModal />
