@@ -11,6 +11,7 @@
     const columnCount = persisted("columnCount", 3);
     const showIndex = persisted("showIndex", false);
     const showNsfw = persisted("showNsfw", false);
+    const autoRotate = persisted("autoRotate", false);
 
     const minColumnWidth = 155;
     let clientWidth: number;
@@ -20,7 +21,7 @@
     const sourceStream = new SourceStream(imageSource);
     const imageFeed = new ImageFeed(sourceStream);
 
-    let openModal: (idx: number) => void;
+    let openModal: (idx: number) => Promise<void>;
 
     function needToFetchImages() {
         const { scrollTop, scrollHeight, clientHeight } =
@@ -75,10 +76,11 @@
         bind:columnCount={$columnCount}
         bind:showIndex={$showIndex}
         bind:showNsfw={$showNsfw}
+        bind:autoRotate={$autoRotate}
         bind:imageSource
     />
 
-    <ImageViewModal {imageFeed} bind:openModal />
+    <ImageViewModal {imageFeed} autoRotate={$autoRotate} bind:openModal />
 
     <ImageGrid
         columnCount={$columnCount}

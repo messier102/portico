@@ -3,9 +3,11 @@
     import { ImageFeed } from "../model/ImageFeed";
     import { fade } from "svelte/transition";
     import { sineInOut } from "svelte/easing";
+    import { tick } from "svelte";
 
     export let imageFeed: ImageFeed;
     export let selectedImageIndex: number | null = null;
+    export let autoRotate: boolean = false;
 
     $: image =
         selectedImageIndex !== null
@@ -15,11 +17,29 @@
     let rotationDegrees: number = 0;
     let lastScrollPos: number;
 
-    export function openModal(idx: number): void {
+    export async function openModal(idx: number): Promise<void> {
         selectedImageIndex = idx;
         lastScrollPos = document.documentElement.scrollTop;
         document.documentElement.style.position = "fixed";
         document.documentElement.style.top = `-${lastScrollPos}px`;
+
+        if (autoRotate) {
+            tryAutoRotate();
+        }
+    }
+
+    async function tryAutoRotate() {
+        await tick();
+
+        const { width: imgWidth, height: imgHeight } = image!.img;
+        const { clientWidth, clientHeight } = document.documentElement;
+
+        if (
+            (imgHeight > imgWidth && clientHeight < clientWidth) ||
+            (imgHeight < imgWidth && clientHeight > clientWidth)
+        ) {
+            rotationDegrees = 90;
+        }
     }
 
     function closeModal() {
@@ -39,12 +59,20 @@
 
         rotationDegrees = 0;
         selectedImageIndex = nextIndex;
+
+        if (autoRotate) {
+            tryAutoRotate();
+        }
     }
 
     async function navigateToPreviousImage() {
         if ((selectedImageIndex as number) > 0) {
             rotationDegrees = 0;
             selectedImageIndex = (selectedImageIndex as number) - 1;
+
+            if (autoRotate) {
+                tryAutoRotate();
+            }
         }
     }
 
