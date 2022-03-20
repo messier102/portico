@@ -38,8 +38,11 @@ A live version is currently hosted at https://portico.tskoll.com.
 - `/r/{subreddit1}+{subreddit2}+...`
 - `/u/{user}/{feed}` - for custom feeds.
 
-#### Query parameters
-- None.
+#### Subpaths
+- `/new` - default for custom feeds.
+- `/hot` - default for subreddits.
+- `/rising`
+- `/top?t={hour|day|week|month|year|all}` - default value of `t` is `day`.
 
 #### Notes
 - Rate limit of up to 300 page fetches every 10 minutes across all subreddits.
