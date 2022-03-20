@@ -43,6 +43,7 @@ A live version is currently hosted at https://portico.tskoll.com.
 - `/hot` - default for subreddits.
 - `/rising`
 - `/top?t={hour|day|week|month|year|all}` - default value of `t` is `day`.
+- `/controversial?t={hour|day|week|month|year|all}` - default value of `t` is `day`.
 
 #### Notes
 - Rate limit of up to 300 page fetches every 10 minutes across all subreddits.
