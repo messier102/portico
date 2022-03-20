@@ -7,7 +7,7 @@ export class RedditSubredditSource implements Source<string, RedditResponse> {
     baseUrl: URL;
 
     constructor(subreddit: string, feed: string, scale: string = "day") {
-        this.name = `r/${subreddit} ${feed} ${`(${scale})` ?? ""}`;
+        this.name = `r/${subreddit} ${feed} ${feed === "top" ? `(${scale})` : ""}`;
         this.baseUrl = new URL(`https://www.reddit.com/r/${subreddit}/${feed}.json`);
         
         if (feed === "top") {
