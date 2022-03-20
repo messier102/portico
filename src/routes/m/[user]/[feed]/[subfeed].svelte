@@ -5,7 +5,9 @@
 
     const user = $page.params.user;
     const feed = $page.params.feed;
-    const imageSource = new RedditCustomFeedSource(user, feed);
+    const subfeed = $page.params.subfeed;
+    const scale = $page.query.get("t") ?? "day";
+    const imageSource = new RedditCustomFeedSource(user, feed, subfeed, scale);
 </script>
 
 <ImageGallery {imageSource} />

@@ -6,9 +6,13 @@ export class RedditSubredditSource implements Source<string, RedditResponse> {
     name: string;
     baseUrl: URL;
 
-    constructor(subreddit: string) {
-        this.name = `r/${subreddit}`;
-        this.baseUrl = new URL(`https://www.reddit.com/r/${subreddit}.json`);
+    constructor(subreddit: string, feed: string, scale: string = "day") {
+        this.name = `r/${subreddit} ${feed} ${feed === "top" ? `(${scale})` : ""}`;
+        this.baseUrl = new URL(`https://www.reddit.com/r/${subreddit}/${feed}.json`);
+        
+        if (feed === "top") {
+            this.baseUrl.searchParams.set("t", scale);
+        }
     }
 
     getPageUrl(pageId: string): URL {

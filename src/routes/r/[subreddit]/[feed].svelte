@@ -4,7 +4,9 @@
     import { RedditSubredditSource } from "$lib/model/sources/reddit/subreddit";
 
     const subreddit = $page.params.subreddit;
-    const imageSource = new RedditSubredditSource(subreddit);
+    const feed = $page.params.feed;
+    const scale = $page.query.get("t") ?? "day";
+    const imageSource = new RedditSubredditSource(subreddit, feed, scale);
 </script>
 
 <ImageGallery {imageSource} />
