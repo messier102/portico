@@ -79,6 +79,10 @@
         }
     }
 
+    function rotate(direction: "left" | "right") {
+        rotationDegrees = rotationDegrees + (direction === "left" ? 90 : -90);
+    }
+
     async function handleKeydown(e: KeyboardEvent) {
         console.log("Key down: " + e.code);
         if (selectedImageIndex !== null) {
@@ -92,9 +96,9 @@
             } else if (e.code === "Escape") {
                 closeModal();
             } else if (e.code === "KeyQ") {
-                rotationDegrees = rotationDegrees - 90;
+                rotate("left");
             } else if (e.code === "KeyE") {
-                rotationDegrees = rotationDegrees + 90;
+                rotate("right");
             }
         }
     }
@@ -136,6 +140,24 @@
                     <img
                         alt="Close lightbox"
                         src="/close.svg"
+                        width="24px"
+                        height="24px"
+                    />
+                </button>
+
+                <button on:click|stopPropagation={() => rotate("left")}>
+                    <img
+                        alt="Rotate left"
+                        src="/rotate-left.svg"
+                        width="24px"
+                        height="24px"
+                    />
+                </button>
+
+                <button on:click|stopPropagation={() => rotate("right")}>
+                    <img
+                        alt="Rotate right"
+                        src="/rotate-right.svg"
                         width="24px"
                         height="24px"
                     />

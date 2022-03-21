@@ -141,8 +141,8 @@
     }
 
     #autorotate + label {
-        -webkit-mask-image: url("/rotate.svg");
-        mask-image: url("/rotate.svg");
+        -webkit-mask-image: url("/rotate-left.svg");
+        mask-image: url("/rotate-left.svg");
     }
 
     #autorotate:checked + label {
