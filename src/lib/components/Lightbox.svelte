@@ -80,7 +80,7 @@
     }
 
     function rotate(direction: "left" | "right") {
-        rotationDegrees = rotationDegrees + (direction === "left" ? 90 : -90);
+        rotationDegrees = rotationDegrees + (direction === "left" ? -90 : 90);
     }
 
     async function handleKeydown(e: KeyboardEvent) {
