@@ -162,6 +162,27 @@
                         height="24px"
                     />
                 </button>
+
+                <button on:click|stopPropagation={() => navigateToPreviousImage()}>
+                    <!-- svelte-ignore a11y-img-redundant-alt -->
+                    <img
+                        alt="Previous image"
+                        src="/left.svg"
+                        width="24px"
+                        height="24px"
+                    />
+                </button>
+
+                
+                <button on:click|stopPropagation={() => navigateToNextImage()}>
+                    <!-- svelte-ignore a11y-img-redundant-alt -->
+                    <img
+                        alt="Next image"
+                        src="/right.svg"
+                        width="24px"
+                        height="24px"
+                    />
+                </button>
             </div>
         {/if}
     </div>
