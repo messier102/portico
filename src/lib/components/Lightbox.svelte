@@ -86,19 +86,25 @@
     async function handleKeydown(e: KeyboardEvent) {
         console.log("Key down: " + e.code);
         if (selectedImageIndex !== null) {
-            if (
-                (e.code === "ArrowLeft" || e.code === "KeyA") &&
-                selectedImageIndex > 0
-            ) {
-                await navigateToPreviousImage();
-            } else if (e.code === "ArrowRight" || e.code === "KeyD") {
-                await navigateToNextImage();
-            } else if (e.code === "Escape") {
-                closeModal();
-            } else if (e.code === "KeyQ") {
-                rotate("left");
-            } else if (e.code === "KeyE") {
-                rotate("right");
+            if (e.code === "Space") {
+                showActionsPanel = !showActionsPanel;
+            } else {
+                showActionsPanel = false;
+
+                if (
+                    (e.code === "ArrowLeft" || e.code === "KeyA") &&
+                    selectedImageIndex > 0
+                ) {
+                    await navigateToPreviousImage();
+                } else if (e.code === "ArrowRight" || e.code === "KeyD") {
+                    await navigateToNextImage();
+                } else if (e.code === "Escape") {
+                    closeModal();
+                } else if (e.code === "KeyQ") {
+                    rotate("left");
+                } else if (e.code === "KeyE") {
+                    rotate("right");
+                }
             }
         }
     }
@@ -163,7 +169,9 @@
                     />
                 </button>
 
-                <button on:click|stopPropagation={() => navigateToPreviousImage()}>
+                <button
+                    on:click|stopPropagation={() => navigateToPreviousImage()}
+                >
                     <!-- svelte-ignore a11y-img-redundant-alt -->
                     <img
                         alt="Previous image"
@@ -173,7 +181,6 @@
                     />
                 </button>
 
-                
                 <button on:click|stopPropagation={() => navigateToNextImage()}>
                     <!-- svelte-ignore a11y-img-redundant-alt -->
                     <img

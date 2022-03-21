@@ -29,6 +29,7 @@ A live version is currently hosted at https://portico.tskoll.com.
 - `Q` - rotate the image 90 degrees counter-clockwise.
 - `E` - rotate the image 90 degrees clockwise.
 - `Esc` or `click` or `tap` - exit lightbox mode.
+- `Space` - toggle action panel visibility.
 
 ## Supported sources
 
