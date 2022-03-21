@@ -2,7 +2,7 @@
     import { onMount, tick } from "svelte";
     import ControlPanel from "$lib/components/ControlPanel.svelte";
     import ImageGrid from "$lib/components/ImageGrid.svelte";
-    import ImageViewModal from "$lib/components/ImageViewModal.svelte";
+    import Lightbox from "$lib/components/Lightbox.svelte";
     import { persisted } from "$lib/model/persisted";
     import { sleepMs } from "$lib/util/sleepMs";
     import { ImageFeed } from "$lib/model/ImageFeed";
@@ -88,7 +88,7 @@
         bind:fullScreen
     />
 
-    <ImageViewModal {imageFeed} autoRotate={$autoRotate} bind:openModal />
+    <Lightbox {imageFeed} autoRotate={$autoRotate} bind:openModal />
 
     <ImageGrid
         columnCount={$columnCount}

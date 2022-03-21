@@ -9,6 +9,8 @@
     export let selectedImageIndex: number | null = null;
     export let autoRotate: boolean = false;
 
+    let showActionsPanel: boolean = true;
+
     $: image =
         selectedImageIndex !== null
             ? $imageFeed[selectedImageIndex]
@@ -18,6 +20,7 @@
     let lastScrollPos: number;
 
     export async function openModal(idx: number): Promise<void> {
+        showActionsPanel = true;
         selectedImageIndex = idx;
         lastScrollPos = document.documentElement.scrollTop;
         document.documentElement.style.position = "fixed";
@@ -76,22 +79,32 @@
         }
     }
 
+    function rotate(direction: "left" | "right") {
+        rotationDegrees = rotationDegrees + (direction === "left" ? -90 : 90);
+    }
+
     async function handleKeydown(e: KeyboardEvent) {
         console.log("Key down: " + e.code);
         if (selectedImageIndex !== null) {
-            if (
-                (e.code === "ArrowLeft" || e.code === "KeyA") &&
-                selectedImageIndex > 0
-            ) {
-                await navigateToPreviousImage();
-            } else if (e.code === "ArrowRight" || e.code === "KeyD") {
-                await navigateToNextImage();
-            } else if (e.code === "Escape") {
-                closeModal();
-            } else if (e.code === "KeyQ") {
-                rotationDegrees = rotationDegrees - 90;
-            } else if (e.code === "KeyE") {
-                rotationDegrees = rotationDegrees + 90;
+            if (e.code === "Space") {
+                showActionsPanel = !showActionsPanel;
+            } else {
+                showActionsPanel = false;
+
+                if (
+                    (e.code === "ArrowLeft" || e.code === "KeyA") &&
+                    selectedImageIndex > 0
+                ) {
+                    await navigateToPreviousImage();
+                } else if (e.code === "ArrowRight" || e.code === "KeyD") {
+                    await navigateToNextImage();
+                } else if (e.code === "Escape") {
+                    closeModal();
+                } else if (e.code === "KeyQ") {
+                    rotate("left");
+                } else if (e.code === "KeyE") {
+                    rotate("right");
+                }
             }
         }
     }
@@ -111,21 +124,94 @@
     <div
         class="modal"
         use:swipeable
-        on:click={() => closeModal()}
+        on:click={() => (showActionsPanel = !showActionsPanel)}
         on:swipe={(e) => handleSwipe(e)}
         transition:fade={{ duration: 200, easing: sineInOut }}
     >
         <img
+            class="image"
             src={image.starred.imageUrl}
             alt={image.starred.name}
             class:rotated-90={(rotationDegrees + 90) % 180 === 0}
             style={`--angle: ${rotationDegrees}deg;
              --scale: ${image.img.height / image.img.width};`}
         />
+
+        {#if showActionsPanel}
+            <div
+                class="actions-panel"
+                transition:fade={{ duration: 200, easing: sineInOut }}
+            >
+                <button on:click={closeModal}>
+                    <img
+                        alt="Close lightbox"
+                        src="/close.svg"
+                        width="24px"
+                        height="24px"
+                    />
+                </button>
+
+                <button on:click|stopPropagation={() => rotate("left")}>
+                    <img
+                        alt="Rotate left"
+                        src="/rotate-left.svg"
+                        width="24px"
+                        height="24px"
+                    />
+                </button>
+
+                <button on:click|stopPropagation={() => rotate("right")}>
+                    <img
+                        alt="Rotate right"
+                        src="/rotate-right.svg"
+                        width="24px"
+                        height="24px"
+                    />
+                </button>
+
+                <button
+                    on:click|stopPropagation={() => navigateToPreviousImage()}
+                >
+                    <!-- svelte-ignore a11y-img-redundant-alt -->
+                    <img
+                        alt="Previous image"
+                        src="/left.svg"
+                        width="24px"
+                        height="24px"
+                    />
+                </button>
+
+                <button on:click|stopPropagation={() => navigateToNextImage()}>
+                    <!-- svelte-ignore a11y-img-redundant-alt -->
+                    <img
+                        alt="Next image"
+                        src="/right.svg"
+                        width="24px"
+                        height="24px"
+                    />
+                </button>
+            </div>
+        {/if}
     </div>
 {/if}
 
 <style>
+    .actions-panel {
+        display: flex;
+        justify-content: space-evenly;
+        position: fixed;
+        bottom: 5px;
+        width: 300px;
+        height: 50px;
+        transition: 0.2s ease-in-out;
+    }
+
+    button {
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+    }
+
     .modal {
         position: fixed;
         top: 0;
@@ -142,7 +228,7 @@
         align-items: center;
     }
 
-    img {
+    .image {
         object-fit: contain;
         height: 100vh;
         width: 100vw;
