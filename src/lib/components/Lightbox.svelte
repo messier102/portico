@@ -9,6 +9,8 @@
     export let selectedImageIndex: number | null = null;
     export let autoRotate: boolean = false;
 
+    let showActionsPanel: boolean = true;
+
     $: image =
         selectedImageIndex !== null
             ? $imageFeed[selectedImageIndex]
@@ -18,6 +20,7 @@
     let lastScrollPos: number;
 
     export async function openModal(idx: number): Promise<void> {
+        showActionsPanel = true;
         selectedImageIndex = idx;
         lastScrollPos = document.documentElement.scrollTop;
         document.documentElement.style.position = "fixed";
@@ -111,21 +114,50 @@
     <div
         class="modal"
         use:swipeable
-        on:click={() => closeModal()}
+        on:click={() => (showActionsPanel = !showActionsPanel)}
         on:swipe={(e) => handleSwipe(e)}
         transition:fade={{ duration: 200, easing: sineInOut }}
     >
         <img
+            class="image"
             src={image.starred.imageUrl}
             alt={image.starred.name}
             class:rotated-90={(rotationDegrees + 90) % 180 === 0}
             style={`--angle: ${rotationDegrees}deg;
              --scale: ${image.img.height / image.img.width};`}
         />
+
+        {#if showActionsPanel}
+            <div
+                class="actions-panel"
+                transition:fade={{ duration: 200, easing: sineInOut }}
+            >
+                <button on:click={closeModal}>
+                    <img
+                        alt="Close lightbox"
+                        src="/close.svg"
+                        width="24px"
+                        height="24px"
+                    />
+                </button>
+            </div>
+        {/if}
     </div>
 {/if}
 
 <style>
+    .actions-panel {
+        display: flex;
+        align-items: center;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 50px;
+        background-color: red;
+        transition: 0.2s ease-in-out;
+    }
+
     .modal {
         position: fixed;
         top: 0;
@@ -142,7 +174,7 @@
         align-items: center;
     }
 
-    img {
+    .image {
         object-fit: contain;
         height: 100vh;
         width: 100vw;
