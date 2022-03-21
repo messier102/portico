@@ -191,14 +191,18 @@
 <style>
     .actions-panel {
         display: flex;
-        align-items: center;
+        justify-content: space-evenly;
         position: fixed;
-        bottom: 0;
-        left: 0;
-        width: 100%;
+        bottom: 5px;
+        width: 300px;
         height: 50px;
-        background-color: red;
         transition: 0.2s ease-in-out;
+    }
+
+    button {
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
     }
 
     .modal {
