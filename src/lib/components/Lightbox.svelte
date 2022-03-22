@@ -3,7 +3,7 @@
     import { AnnotatedImage } from "../model/ImageFeed";
     import { fade } from "svelte/transition";
     import { sineInOut } from "svelte/easing";
-    import { createEventDispatcher, onMount, tick } from "svelte";
+    import { createEventDispatcher, tick } from "svelte";
 
     const dispatch = createEventDispatcher();
 
