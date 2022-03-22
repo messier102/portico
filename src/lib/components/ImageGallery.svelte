@@ -28,7 +28,9 @@
     const sourceStream = new SourceStream(imageSource);
     const imageFeed = new ImageFeed(sourceStream);
 
-    let openModal: (idx: number) => Promise<void>;
+    let selectedImageIndex: number | null = null;
+    $: selectedImage =
+        selectedImageIndex !== null ? $imageFeed[selectedImageIndex] : null;
 
     function needToFetchImages() {
         const { scrollTop, scrollHeight, clientHeight } =
@@ -63,6 +65,42 @@
 
         $columnCount = Math.min($columnCount, maxColumnCount);
     }
+
+    function openLightbox(index: number) {
+        selectedImageIndex = index;
+        disableScrolling();
+    }
+
+    function closeLightbox() {
+        selectedImageIndex = null;
+        enableScrolling();
+    }
+
+    async function navigateToNextImage() {
+        const nextIndex = (selectedImageIndex as number) + 1;
+        await imageFeed.at(nextIndex);
+        selectedImageIndex = nextIndex;
+    }
+
+    async function navigateToPreviousImage() {
+        if ((selectedImageIndex as number) > 0) {
+            selectedImageIndex = (selectedImageIndex as number) - 1;
+        }
+    }
+
+    let lastScrollPos: number;
+
+    function disableScrolling() {
+        lastScrollPos = document.documentElement.scrollTop;
+        document.documentElement.style.position = "fixed";
+        document.documentElement.style.top = `-${lastScrollPos}px`;
+    }
+
+    function enableScrolling() {
+        document.documentElement.style.position = "static";
+        document.documentElement.style.top = "auto";
+        document.documentElement.scrollTop = lastScrollPos; // must be last
+    }
 </script>
 
 <svelte:window
@@ -88,14 +126,22 @@
         bind:fullScreen
     />
 
-    <Lightbox {imageFeed} autoRotate={$autoRotate} bind:openModal />
+    {#if selectedImage}
+        <Lightbox
+            image={selectedImage}
+            autoRotate={$autoRotate}
+            on:close={closeLightbox}
+            on:next={navigateToNextImage}
+            on:previous={navigateToPreviousImage}
+        />
+    {/if}
 
     <ImageGrid
         columnCount={$columnCount}
         showIndex={$showIndex}
         showNsfw={$showNsfw}
         images={$imageFeed}
-        on:select={(e) => openModal(e.detail)}
+        on:select={(e) => openLightbox(e.detail)}
     />
 </main>
 

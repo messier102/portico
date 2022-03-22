@@ -1,40 +1,43 @@
 <script lang="ts">
     import { swipeable, SwipeEvent } from "../actions/swipeable";
-    import { ImageFeed } from "../model/ImageFeed";
+    import { AnnotatedImage } from "../model/ImageFeed";
     import { fade } from "svelte/transition";
     import { sineInOut } from "svelte/easing";
-    import { tick } from "svelte";
+    import { createEventDispatcher, onMount, tick } from "svelte";
 
-    export let imageFeed: ImageFeed;
-    export let selectedImageIndex: number | null = null;
-    export let autoRotate: boolean = false;
+    const dispatch = createEventDispatcher();
 
-    let showActionsPanel: boolean = true;
-
-    $: image =
-        selectedImageIndex !== null
-            ? $imageFeed[selectedImageIndex]
-            : undefined;
-
-    let rotationDegrees: number = 0;
-    let lastScrollPos: number;
-
-    export async function openModal(idx: number): Promise<void> {
-        showActionsPanel = true;
-        selectedImageIndex = idx;
-        lastScrollPos = document.documentElement.scrollTop;
-        document.documentElement.style.position = "fixed";
-        document.documentElement.style.top = `-${lastScrollPos}px`;
-
-        if (autoRotate) {
+    export let image: AnnotatedImage;
+    export let autoRotate: boolean;
+    $: {
+        if (image && autoRotate) {
             tryAutoRotate();
         }
+    }
+
+    let showActionsPanel: boolean = true;
+    let rotationDegrees: number = 0;
+
+    function close() {
+        dispatch("close");
+    }
+
+    async function navigate(direction: "next" | "previous") {
+        // TODO: Silently reset every 360 rotation to 0 to prevent excessive spin.
+        // Not sure how to temporarily disable the rotation transition to do that.
+        rotationDegrees = 0;
+
+        dispatch(direction);
+    }
+
+    function rotate(direction: "left" | "right") {
+        rotationDegrees = rotationDegrees + (direction === "left" ? -90 : 90);
     }
 
     async function tryAutoRotate() {
         await tick();
 
-        const { width: imgWidth, height: imgHeight } = image!.img;
+        const { width: imgWidth, height: imgHeight } = image.img;
         const { clientWidth, clientHeight } = document.documentElement;
 
         if (
@@ -45,155 +48,108 @@
         }
     }
 
-    function closeModal() {
-        rotationDegrees = 0;
-        selectedImageIndex = null;
-        document.documentElement.style.position = "static";
-        document.documentElement.style.top = "auto";
-        document.documentElement.scrollTop = lastScrollPos;
-    }
-
-    async function navigateToNextImage() {
-        const nextIndex = (selectedImageIndex as number) + 1;
-        await imageFeed.at(nextIndex);
-
-        // TODO: Silently reset every 360 rotation to 0 to prevent excessive spin.
-        // Not sure how to temporarily disable the rotation transition to do that.
-
-        rotationDegrees = 0;
-        selectedImageIndex = nextIndex;
-
-        if (autoRotate) {
-            tryAutoRotate();
-        }
-    }
-
-    async function navigateToPreviousImage() {
-        if ((selectedImageIndex as number) > 0) {
-            rotationDegrees = 0;
-            selectedImageIndex = (selectedImageIndex as number) - 1;
-
-            if (autoRotate) {
-                tryAutoRotate();
-            }
-        }
-    }
-
-    function rotate(direction: "left" | "right") {
-        rotationDegrees = rotationDegrees + (direction === "left" ? -90 : 90);
-    }
-
-    async function handleKeydown(e: KeyboardEvent) {
+    function handleKeydown(e: KeyboardEvent) {
         console.log("Key down: " + e.code);
-        if (selectedImageIndex !== null) {
-            if (e.code === "Space") {
-                showActionsPanel = !showActionsPanel;
-            } else {
-                showActionsPanel = false;
+        if (e.code === "Space") {
+            showActionsPanel = !showActionsPanel;
+        } else {
+            showActionsPanel = false;
 
-                if (
-                    (e.code === "ArrowLeft" || e.code === "KeyA") &&
-                    selectedImageIndex > 0
-                ) {
-                    await navigateToPreviousImage();
-                } else if (e.code === "ArrowRight" || e.code === "KeyD") {
-                    await navigateToNextImage();
-                } else if (e.code === "Escape") {
-                    closeModal();
-                } else if (e.code === "KeyQ") {
-                    rotate("left");
-                } else if (e.code === "KeyE") {
-                    rotate("right");
-                }
+            if (e.code === "ArrowLeft" || e.code === "KeyA") {
+                navigate("previous");
+            } else if (e.code === "ArrowRight" || e.code === "KeyD") {
+                navigate("next");
+            } else if (e.code === "Escape") {
+                close();
+            } else if (e.code === "KeyQ") {
+                rotate("left");
+            } else if (e.code === "KeyE") {
+                rotate("right");
             }
         }
     }
 
-    async function handleSwipe(e: SwipeEvent) {
+    function handleSwipe(e: SwipeEvent) {
         if (e.detail.direction === "up") {
-            await navigateToNextImage();
+            navigate("next");
         } else if (e.detail.direction === "down") {
-            await navigateToPreviousImage();
+            navigate("previous");
         }
     }
 </script>
 
 <svelte:window on:keydown={handleKeydown} />
 
-{#if image}
-    <div
-        class="modal"
-        use:swipeable
-        on:click={() => (showActionsPanel = !showActionsPanel)}
-        on:swipe={(e) => handleSwipe(e)}
-        transition:fade={{ duration: 200, easing: sineInOut }}
-    >
-        <img
-            class="image"
-            src={image.starred.imageUrl}
-            alt={image.starred.name}
-            class:rotated-90={(rotationDegrees + 90) % 180 === 0}
-            style={`--angle: ${rotationDegrees}deg;
-             --scale: ${image.img.height / image.img.width};`}
-        />
+<div
+    class="modal"
+    use:swipeable
+    on:click={() => (showActionsPanel = !showActionsPanel)}
+    on:swipe={(e) => handleSwipe(e)}
+    transition:fade={{ duration: 200, easing: sineInOut }}
+>
+    <img
+        class="image"
+        src={image.starred.imageUrl}
+        alt={image.starred.name}
+        class:rotated-90={(rotationDegrees + 90) % 180 === 0}
+        style={`--angle: ${rotationDegrees}deg;
+                --scale: ${image.img.height / image.img.width};`}
+    />
 
-        {#if showActionsPanel}
-            <div
-                class="actions-panel"
-                transition:fade={{ duration: 200, easing: sineInOut }}
-            >
-                <button on:click={closeModal}>
-                    <img
-                        alt="Close lightbox"
-                        src="/close.svg"
-                        width="24px"
-                        height="24px"
-                    />
-                </button>
+    {#if showActionsPanel}
+        <div
+            class="actions-panel"
+            transition:fade={{ duration: 200, easing: sineInOut }}
+        >
+            <button on:click={close}>
+                <img
+                    alt="Close lightbox"
+                    src="/close.svg"
+                    width="24px"
+                    height="24px"
+                />
+            </button>
 
-                <button on:click|stopPropagation={() => rotate("left")}>
-                    <img
-                        alt="Rotate left"
-                        src="/rotate-left.svg"
-                        width="24px"
-                        height="24px"
-                    />
-                </button>
+            <button on:click|stopPropagation={() => rotate("left")}>
+                <img
+                    alt="Rotate left"
+                    src="/rotate-left.svg"
+                    width="24px"
+                    height="24px"
+                />
+            </button>
 
-                <button on:click|stopPropagation={() => rotate("right")}>
-                    <img
-                        alt="Rotate right"
-                        src="/rotate-right.svg"
-                        width="24px"
-                        height="24px"
-                    />
-                </button>
+            <button on:click|stopPropagation={() => rotate("right")}>
+                <img
+                    alt="Rotate right"
+                    src="/rotate-right.svg"
+                    width="24px"
+                    height="24px"
+                />
+            </button>
 
-                <button
-                    on:click|stopPropagation={() => navigateToPreviousImage()}
-                >
-                    <!-- svelte-ignore a11y-img-redundant-alt -->
-                    <img
-                        alt="Previous image"
-                        src="/left.svg"
-                        width="24px"
-                        height="24px"
-                    />
-                </button>
+            <button on:click|stopPropagation={() => navigate("previous")}>
+                <!-- svelte-ignore a11y-img-redundant-alt -->
+                <img
+                    alt="Previous image"
+                    src="/left.svg"
+                    width="24px"
+                    height="24px"
+                />
+            </button>
 
-                <button on:click|stopPropagation={() => navigateToNextImage()}>
-                    <!-- svelte-ignore a11y-img-redundant-alt -->
-                    <img
-                        alt="Next image"
-                        src="/right.svg"
-                        width="24px"
-                        height="24px"
-                    />
-                </button>
-            </div>
-        {/if}
-    </div>
-{/if}
+            <button on:click|stopPropagation={() => navigate("next")}>
+                <!-- svelte-ignore a11y-img-redundant-alt -->
+                <img
+                    alt="Next image"
+                    src="/right.svg"
+                    width="24px"
+                    height="24px"
+                />
+            </button>
+        </div>
+    {/if}
+</div>
 
 <style>
     .actions-panel {
