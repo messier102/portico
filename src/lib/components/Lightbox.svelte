@@ -20,7 +20,7 @@
         }
     }
 
-    async function navigate(direction: "next" | "previous") {
+    function navigate(direction: "next" | "previous") {
         dispatch(direction);
         rotationDegrees = 0;
     }
@@ -31,9 +31,7 @@
         rotationDegrees = rotationDegrees + (direction === "left" ? -90 : 90);
     }
 
-    async function tryAutoRotate() {
-        await tick();
-
+    function tryAutoRotate() {
         const { width: imgWidth, height: imgHeight } = image.img;
         const { clientWidth, clientHeight } = document.documentElement;
 
