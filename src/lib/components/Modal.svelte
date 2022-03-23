@@ -5,26 +5,20 @@
 
     const dispatch = createEventDispatcher();
 
-    let lastScrollPosition: number;
+    onMount(() => lockScrolling(document.documentElement));
 
-    onMount(() => {
-        disableBackgroundScrolling();
+    function lockScrolling(element: HTMLElement) {
+        const lastScrollPosition = element.scrollTop;
+        element.style.position = "fixed";
+        element.style.top = `-${lastScrollPosition}px`;
 
-        return () => {
-            enableBackgroundScrolling();
+        const unlockScrolling = () => {
+            element.style.position = "";
+            element.style.top = "";
+            element.scrollTop = lastScrollPosition;
         };
-    });
 
-    function disableBackgroundScrolling() {
-        lastScrollPosition = document.documentElement.scrollTop;
-        document.documentElement.style.position = "fixed";
-        document.documentElement.style.top = `-${lastScrollPosition}px`;
-    }
-
-    function enableBackgroundScrolling() {
-        document.documentElement.style.position = "static";
-        document.documentElement.style.top = "auto";
-        document.documentElement.scrollTop = lastScrollPosition; // must be last
+        return unlockScrolling;
     }
 
     function closeModal() {
