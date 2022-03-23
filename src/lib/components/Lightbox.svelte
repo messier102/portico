@@ -9,24 +9,28 @@
 
     export let image: AnnotatedImage;
     export let autoRotate: boolean;
-    $: {
-        if (image && autoRotate) {
-            tryAutoRotate();
-        }
-    }
 
     let showActionsPanel: boolean = true;
     let rotationDegrees: number = 0;
 
-    async function navigate(direction: "next" | "previous") {
-        // TODO: Silently reset every 360 rotation to 0 to prevent excessive spin.
-        // Not sure how to temporarily disable the rotation transition to do that.
-        rotationDegrees = 0;
+    $: {
+        // subscribe to image changes
+        if (image) {
+            rotationDegrees = 0;
 
+            if (autoRotate) {
+                tryAutoRotate();
+            }
+        }
+    }
+
+    async function navigate(direction: "next" | "previous") {
         dispatch(direction);
     }
 
     function rotate(direction: "left" | "right") {
+        // TODO: Silently reset every 360 rotation to 0 to prevent excessive spin.
+        // Not sure how to temporarily disable the rotation transition to do that.
         rotationDegrees = rotationDegrees + (direction === "left" ? -90 : 90);
     }
 
