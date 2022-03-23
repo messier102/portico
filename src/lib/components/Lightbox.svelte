@@ -18,10 +18,6 @@
     let showActionsPanel: boolean = true;
     let rotationDegrees: number = 0;
 
-    function close() {
-        dispatch("close");
-    }
-
     async function navigate(direction: "next" | "previous") {
         // TODO: Silently reset every 360 rotation to 0 to prevent excessive spin.
         // Not sure how to temporarily disable the rotation transition to do that.
@@ -59,8 +55,6 @@
                 navigate("previous");
             } else if (e.code === "ArrowRight" || e.code === "KeyD") {
                 navigate("next");
-            } else if (e.code === "Escape") {
-                close();
             } else if (e.code === "KeyQ") {
                 rotate("left");
             } else if (e.code === "KeyE") {
@@ -81,11 +75,10 @@
 <svelte:window on:keydown={handleKeydown} />
 
 <div
-    class="modal"
+    class="wrapper"
     use:swipeable
     on:click={() => (showActionsPanel = !showActionsPanel)}
     on:swipe={(e) => handleSwipe(e)}
-    transition:fade={{ duration: 200, easing: sineInOut }}
 >
     <img
         class="image"
@@ -101,15 +94,6 @@
             class="actions-panel"
             transition:fade={{ duration: 200, easing: sineInOut }}
         >
-            <button on:click={close}>
-                <img
-                    alt="Close lightbox"
-                    src="/close.svg"
-                    width="24px"
-                    height="24px"
-                />
-            </button>
-
             <button on:click|stopPropagation={() => rotate("left")}>
                 <img
                     alt="Rotate left"
@@ -157,7 +141,7 @@
         justify-content: space-evenly;
         position: fixed;
         bottom: 5px;
-        width: 300px;
+        width: 260px;
         height: 50px;
         transition: 0.2s ease-in-out;
     }
@@ -168,20 +152,9 @@
         align-items: center;
     }
 
-    .modal {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: 2;
-
-        background-color: rgba(0, 0, 0, 0.8);
-        backdrop-filter: blur(10px);
-
+    .wrapper {
         display: flex;
         justify-content: center;
-        align-items: center;
     }
 
     .image {

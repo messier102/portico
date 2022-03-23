@@ -3,6 +3,7 @@
     import ControlPanel from "$lib/components/ControlPanel.svelte";
     import ImageGrid from "$lib/components/ImageGrid.svelte";
     import Lightbox from "$lib/components/Lightbox.svelte";
+    import Modal from "./Modal.svelte";
     import { persisted } from "$lib/model/persisted";
     import { sleepMs } from "$lib/util/sleepMs";
     import { ImageFeed } from "$lib/model/ImageFeed";
@@ -68,12 +69,10 @@
 
     function openLightbox(index: number) {
         selectedImageIndex = index;
-        disableScrolling();
     }
 
     function closeLightbox() {
         selectedImageIndex = null;
-        enableScrolling();
     }
 
     async function navigateToNextImage() {
@@ -86,20 +85,6 @@
         if ((selectedImageIndex as number) > 0) {
             selectedImageIndex = (selectedImageIndex as number) - 1;
         }
-    }
-
-    let lastScrollPos: number;
-
-    function disableScrolling() {
-        lastScrollPos = document.documentElement.scrollTop;
-        document.documentElement.style.position = "fixed";
-        document.documentElement.style.top = `-${lastScrollPos}px`;
-    }
-
-    function enableScrolling() {
-        document.documentElement.style.position = "static";
-        document.documentElement.style.top = "auto";
-        document.documentElement.scrollTop = lastScrollPos; // must be last
     }
 </script>
 
@@ -127,13 +112,14 @@
     />
 
     {#if selectedImage}
-        <Lightbox
-            image={selectedImage}
-            autoRotate={$autoRotate}
-            on:close={closeLightbox}
-            on:next={navigateToNextImage}
-            on:previous={navigateToPreviousImage}
-        />
+        <Modal on:close={closeLightbox}>
+            <Lightbox
+                image={selectedImage}
+                autoRotate={$autoRotate}
+                on:next={navigateToNextImage}
+                on:previous={navigateToPreviousImage}
+            />
+        </Modal>
     {/if}
 
     <ImageGrid
