@@ -16,12 +16,16 @@
     $: {
         // subscribe to image changes
         if (image) {
-            rotationDegrees = 0;
+            resetRotation();
 
             if (autoRotate) {
                 tryAutoRotate();
             }
         }
+    }
+
+    function resetRotation() {
+        rotationDegrees = 0;
     }
 
     async function navigate(direction: "next" | "previous") {
