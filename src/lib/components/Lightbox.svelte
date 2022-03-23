@@ -15,21 +15,14 @@
 
     $: {
         // subscribe to image changes
-        if (image) {
-            resetRotation();
-
-            if (autoRotate) {
-                tryAutoRotate();
-            }
+        if (image && autoRotate) {
+            tryAutoRotate();
         }
-    }
-
-    function resetRotation() {
-        rotationDegrees = 0;
     }
 
     async function navigate(direction: "next" | "previous") {
         dispatch(direction);
+        rotationDegrees = 0;
     }
 
     function rotate(direction: "left" | "right") {
