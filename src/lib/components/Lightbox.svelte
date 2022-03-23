@@ -93,8 +93,8 @@
         src={image.starred.imageUrl}
         alt={image.starred.name}
         class:rotated-90={(rotationDegrees + 90) % 180 === 0}
-        style={`--angle: ${rotationDegrees}deg;
-                --scale: ${image.img.height / image.img.width};`}
+        style:--angle={rotationDegrees + "deg"}
+        style:--scale={image.img.height / image.img.width}
     />
 
     {#if showActionsPanel}
