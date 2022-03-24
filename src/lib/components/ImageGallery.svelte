@@ -8,11 +8,14 @@
     import { sleepMs } from "$lib/util/sleepMs";
     import { ImageFeed } from "$lib/model/ImageFeed";
     import { Source, SourceStream } from "$lib/model/ImageSource";
+    import IntersectionObserver from "./IntersectionObserver.svelte";
 
     const columnCount = persisted("columnCount", 3);
     const showIndex = persisted("showIndex", false);
     const showNsfw = persisted("showNsfw", false);
     const autoRotate = persisted("autoRotate", false);
+
+    let screenIsFilled = false;
 
     let fullScreen = false;
     $: if (fullScreen) {
@@ -33,31 +36,21 @@
     $: selectedImage =
         selectedImageIndex !== null ? $imageFeed[selectedImageIndex] : null;
 
-    function needToFetchImages() {
-        const { scrollTop, scrollHeight, clientHeight } =
-            document.documentElement;
-
-        const scrolledToBottom = scrollTop + clientHeight >= scrollHeight - 100;
-
-        return scrolledToBottom;
-    }
-
     onMount(async () => {
-        await tick();
-
-        while (!imageFeed.exhausted && needToFetchImages()) {
-            console.log("Fetching more images");
-            await imageFeed.requestFetch();
-            await tick();
-        }
-
-        console.log("Done fetching");
+        await tick(); // why is this here again?
     });
 
-    async function handleScroll() {
-        if (!imageFeed.exhausted && needToFetchImages()) {
-            await imageFeed.requestFetch();
-        }
+    async function tryFetch() {
+        do {
+            console.log("Trying to fetch");
+
+            if (!imageFeed.exhausted) {
+                console.log("Fetching");
+                await imageFeed.requestFetch();
+            }
+
+            console.log("Done fetching");
+        } while (!screenIsFilled);
     }
 
     async function handleResize() {
@@ -88,11 +81,7 @@
     }
 </script>
 
-<svelte:window
-    bind:innerWidth={clientWidth}
-    on:resize={handleResize}
-    on:scroll={handleScroll}
-/>
+<svelte:window bind:innerWidth={clientWidth} on:resize={handleResize} />
 
 <svelte:head>
     <title>
@@ -129,10 +118,40 @@
         images={$imageFeed}
         on:select={(e) => openLightbox(e.detail)}
     />
+
+    <IntersectionObserver
+        on:enter={tryFetch}
+        on:exit|once={() => (screenIsFilled = true)}
+    >
+        <img
+            class="loading"
+            alt="Loading indicator"
+            src="/loading.svg"
+            width="50px"
+        />
+    </IntersectionObserver>
 </main>
 
 <style>
     main {
         user-select: none;
+    }
+
+    .loading {
+        display: block;
+        margin: auto;
+        margin-top: 20px;
+        margin-bottom: 60px;
+        filter: invert();
+        animation: spin 1.5s infinite linear;
+    }
+
+    @keyframes spin {
+        from {
+            transform: rotate(0deg);
+        }
+        to {
+            transform: rotate(359deg);
+        }
     }
 </style>
