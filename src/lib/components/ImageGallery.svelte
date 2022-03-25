@@ -23,8 +23,8 @@
     }
 
     const minColumnWidth = 180; // allows for two-column layout on iPhone SE, most phones
-    let clientWidth: number = 1000; // arbitrary number to avoid NaN in maxColumnCount before init
-    $: maxColumnCount = Math.max(Math.floor(clientWidth / minColumnWidth), 1);
+    let viewportWidth: number = 1000; // arbitrary number to avoid NaN in maxColumnCount before init
+    $: maxColumnCount = Math.max(Math.floor(viewportWidth / minColumnWidth), 1);
     $: limitColumnCount(maxColumnCount);
 
     function limitColumnCount(max: number) {
@@ -73,7 +73,7 @@
     }
 </script>
 
-<svelte:window bind:innerWidth={clientWidth} />
+<svelte:window bind:innerWidth={viewportWidth} />
 
 <svelte:head>
     <title>
