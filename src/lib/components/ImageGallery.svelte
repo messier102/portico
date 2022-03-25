@@ -1,11 +1,9 @@
 <script lang="ts">
-    import { onMount, tick } from "svelte";
     import ControlPanel from "$lib/components/ControlPanel.svelte";
     import ImageGrid from "$lib/components/ImageGrid.svelte";
     import Lightbox from "$lib/components/Lightbox.svelte";
     import Modal from "./Modal.svelte";
     import { persisted } from "$lib/model/persisted";
-    import { sleepMs } from "$lib/util/sleepMs";
     import { ImageFeed } from "$lib/model/ImageFeed";
     import { Source, SourceStream } from "$lib/model/ImageSource";
     import IntersectionObserver from "./IntersectionObserver.svelte";
@@ -24,9 +22,14 @@
         document.exitFullscreen();
     }
 
-    const minColumnWidth = 155;
-    let clientWidth: number;
-    $: maxColumnCount = Math.max(Math.floor(clientWidth / minColumnWidth), 1);
+    const minColumnWidth = 180; // allows for two-column layout on iPhone SE, most phones
+    let viewportWidth: number = 1000; // arbitrary number to avoid NaN in maxColumnCount before init
+    $: maxColumnCount = Math.max(Math.floor(viewportWidth / minColumnWidth), 1);
+    $: limitColumnCount(maxColumnCount);
+
+    function limitColumnCount(max: number) {
+        $columnCount = Math.min($columnCount, max);
+    }
 
     export let imageSource: Source<unknown, unknown>;
     const sourceStream = new SourceStream(imageSource);
@@ -35,10 +38,6 @@
     let selectedImageIndex: number | null = null;
     $: selectedImage =
         selectedImageIndex !== null ? $imageFeed[selectedImageIndex] : null;
-
-    onMount(async () => {
-        await tick(); // why is this here again?
-    });
 
     async function tryFetch() {
         do {
@@ -51,13 +50,6 @@
 
             console.log("Done fetching");
         } while (!screenIsFilled);
-    }
-
-    async function handleResize() {
-        // Seems like the resize event doesn't fire immediately on maximizing/restoring the window.
-        await sleepMs(100);
-
-        $columnCount = Math.min($columnCount, maxColumnCount);
     }
 
     function openLightbox(index: number) {
@@ -81,7 +73,7 @@
     }
 </script>
 
-<svelte:window bind:innerWidth={clientWidth} on:resize={handleResize} />
+<svelte:window bind:innerWidth={viewportWidth} />
 
 <svelte:head>
     <title>
