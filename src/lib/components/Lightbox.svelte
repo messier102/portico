@@ -1,21 +1,17 @@
 <script lang="ts">
-    import { tweened } from "svelte/motion";
     import { AnnotatedImage } from "../model/ImageFeed";
     import { fade } from "svelte/transition";
-    import { cubicOut, sineInOut } from "svelte/easing";
+    import { sineInOut } from "svelte/easing";
     import { createEventDispatcher } from "svelte";
+    import Carousel from "./Carousel.svelte";
 
     const dispatch = createEventDispatcher();
 
     export let image: AnnotatedImage;
-    export let prevImage: AnnotatedImage | null;
-    export let nextImage: AnnotatedImage | null;
+    export let prevImage: AnnotatedImage | null = null;
+    export let nextImage: AnnotatedImage | null = null;
 
     let showActionsPanel: boolean = true;
-
-    // see https://chanind.github.io/javascript/2019/09/28/avoid-100vh-on-mobile-web.html
-    let viewportHeight: number = 0;
-    let viewportWidth: number = 0;
 
     function navigate(direction: "next" | "previous") {
         dispatch(direction);
@@ -35,99 +31,45 @@
             }
         }
     }
-
-    let touchStartY = 0;
-
-    let sliderInitialOffsetY = 0;
-
-    let sliderOffsetY = tweened(0, {
-        easing: cubicOut,
-        duration: 0,
-    });
-
-    function handleTouchStart(event: TouchEvent) {
-        if ($sliderOffsetY !== 0) {
-            // stop tweening and pin slider in place
-            $sliderOffsetY = $sliderOffsetY;
-        }
-
-        touchStartY = event.changedTouches[0].clientY;
-        sliderInitialOffsetY = $sliderOffsetY;
-    }
-
-    function handleTouchMove(event: TouchEvent) {
-        const touchMoveY = event.changedTouches[0].clientY;
-        const touchDeltaY = touchMoveY - touchStartY;
-
-        $sliderOffsetY = sliderInitialOffsetY + touchDeltaY;
-    }
-
-    async function handleTouchEnd(_: TouchEvent) {
-        const swipeThreshold = 100;
-        const sliderOffsetDeltaY = $sliderOffsetY - sliderInitialOffsetY;
-
-        if (sliderOffsetDeltaY > swipeThreshold && prevImage) {
-            navigate("previous");
-
-            $sliderOffsetY -= viewportHeight;
-        } else if (sliderOffsetDeltaY < -swipeThreshold && nextImage) {
-            navigate("next");
-
-            $sliderOffsetY += viewportHeight;
-        }
-
-        await sliderOffsetY.set(0, { duration: 500 });
-    }
-
-    async function handleTouchCancel() {
-        await sliderOffsetY.set(0, { duration: 500 });
-    }
 </script>
 
-<svelte:window
-    on:keydown={handleKeydown}
-    bind:innerHeight={viewportHeight}
-    bind:innerWidth={viewportWidth}
-/>
+<svelte:window on:keydown={handleKeydown} />
 
 <div class="lightbox" on:click={() => (showActionsPanel = !showActionsPanel)}>
-    <div
-        class="slider"
-        on:touchstart={handleTouchStart}
-        on:touchmove={handleTouchMove}
-        on:touchend={handleTouchEnd}
-        on:touchcancel={handleTouchCancel}
-        style:--viewportHeight={`${viewportHeight}px`}
-        style:--sliderOffsetY={`${$sliderOffsetY}px`}
+    <Carousel
+        hasPrevious={Boolean(prevImage)}
+        hasNext={Boolean(nextImage)}
+        on:next
+        on:previous
     >
-        {#if prevImage}
-            <div class="prev-image">
+        <svelte:fragment slot="previous">
+            {#if prevImage}
                 <img
                     class="image"
                     src={prevImage.starred.imageUrl}
                     alt={prevImage.starred.name}
                 />
-            </div>
-        {/if}
+            {/if}
+        </svelte:fragment>
 
-        <div class="current-image">
+        <svelte:fragment slot="current">
             <img
                 class="image"
                 src={image.starred.imageUrl}
                 alt={image.starred.name}
             />
-        </div>
+        </svelte:fragment>
 
-        {#if nextImage}
-            <div class="next-image">
+        <svelte:fragment slot="next">
+            {#if nextImage}
                 <img
                     class="image"
                     src={nextImage.starred.imageUrl}
                     alt={nextImage.starred.name}
                 />
-            </div>
-        {/if}
-    </div>
+            {/if}
+        </svelte:fragment>
+    </Carousel>
 
     {#if showActionsPanel}
         <div
@@ -158,28 +100,15 @@
 </div>
 
 <style>
-    .slider {
-        display: grid;
-        grid-template-rows: repeat(3, var(--viewportHeight));
-        transform: translateY(var(--sliderOffsetY));
+    .lightbox {
+        display: flex;
+        justify-content: center;
     }
 
     .image {
         object-fit: contain;
         height: 100%;
         width: 100%;
-    }
-
-    .prev-image {
-        grid-row: 1 / span 1;
-    }
-
-    .current-image {
-        grid-row: 2 / span 1;
-    }
-
-    .next-image {
-        grid-row: 3 / span 1;
     }
 
     .actions-panel {
@@ -196,10 +125,5 @@
         border-radius: 8px;
         display: flex;
         align-items: center;
-    }
-
-    .lightbox {
-        display: flex;
-        justify-content: center;
     }
 </style>
