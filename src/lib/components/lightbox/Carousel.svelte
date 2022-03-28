@@ -11,6 +11,8 @@
     export let hasPrevious: boolean = false;
     export let hasNext: boolean = false;
 
+    let isAnimating = false;
+
     // https://chanind.github.io/javascript/2019/09/28/avoid-100vh-on-mobile-web.html
     let viewportHeight: number = 0;
 
@@ -24,6 +26,8 @@
     });
 
     function handleTouchStart(event: TouchEvent) {
+        isAnimating = true;
+
         if ($sliderOffsetY !== 0) {
             // stop tweening and pin slider in place
             $sliderOffsetY = $sliderOffsetY;
@@ -40,7 +44,7 @@
         $sliderOffsetY = sliderInitialOffsetY + touchDeltaY;
     }
 
-    function handleTouchEnd(_: TouchEvent) {
+    async function handleTouchEnd(_: TouchEvent) {
         const sliderOffsetDeltaY = $sliderOffsetY - sliderInitialOffsetY;
 
         if (sliderOffsetDeltaY > swipeThresholdPx && hasPrevious) {
@@ -55,11 +59,15 @@
 
         // parent component MUST handle navigation events for this to work
         // TODO: a way to better decouple this
-        sliderOffsetY.set(0, { duration: swipeDurationMs });
+        await sliderOffsetY.set(0, { duration: swipeDurationMs });
+
+        isAnimating = false;
     }
 
-    function handleTouchCancel() {
-        sliderOffsetY.set(0, { duration: swipeDurationMs });
+    async function handleTouchCancel() {
+        await sliderOffsetY.set(0, { duration: swipeDurationMs });
+
+        isAnimating = false;
     }
 </script>
 
@@ -73,6 +81,7 @@
     on:touchcancel={handleTouchCancel}
     style:--viewportHeight={`${viewportHeight}px`}
     style:--sliderOffsetY={`${$sliderOffsetY}px`}
+    class:animating={isAnimating}
 >
     <div class="previous">
         <slot name="previous" />
@@ -92,6 +101,10 @@
         display: grid;
         grid-template-rows: repeat(3, var(--viewportHeight));
         transform: translateY(var(--sliderOffsetY));
+    }
+
+    .animating {
+        will-change: transform;
     }
 
     .previous {
