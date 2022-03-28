@@ -4,6 +4,7 @@
     import { sineInOut } from "svelte/easing";
     import { createEventDispatcher } from "svelte";
     import Carousel from "./Carousel.svelte";
+    import Modal from "./Modal.svelte";
 
     const dispatch = createEventDispatcher();
 
@@ -35,69 +36,74 @@
 
 <svelte:window on:keydown={handleKeydown} />
 
-<div class="lightbox" on:click={() => (showActionsPanel = !showActionsPanel)}>
-    <Carousel
-        hasPrevious={Boolean(prevImage)}
-        hasNext={Boolean(nextImage)}
-        on:next
-        on:previous
+<Modal on:close>
+    <div
+        class="lightbox"
+        on:click={() => (showActionsPanel = !showActionsPanel)}
     >
-        <svelte:fragment slot="previous">
-            {#if prevImage}
-                <img
-                    class="image"
-                    src={prevImage.starred.imageUrl}
-                    alt={prevImage.starred.name}
-                />
-            {/if}
-        </svelte:fragment>
-
-        <svelte:fragment slot="current">
-            <img
-                class="image"
-                src={image.starred.imageUrl}
-                alt={image.starred.name}
-            />
-        </svelte:fragment>
-
-        <svelte:fragment slot="next">
-            {#if nextImage}
-                <img
-                    class="image"
-                    src={nextImage.starred.imageUrl}
-                    alt={nextImage.starred.name}
-                />
-            {/if}
-        </svelte:fragment>
-    </Carousel>
-
-    {#if showActionsPanel}
-        <div
-            class="actions-panel"
-            transition:fade={{ duration: 200, easing: sineInOut }}
+        <Carousel
+            hasPrevious={Boolean(prevImage)}
+            hasNext={Boolean(nextImage)}
+            on:next
+            on:previous
         >
-            <button on:click|stopPropagation={() => navigate("previous")}>
-                <!-- svelte-ignore a11y-img-redundant-alt -->
-                <img
-                    alt="Previous image"
-                    src="/left.svg"
-                    width="24px"
-                    height="24px"
-                />
-            </button>
+            <svelte:fragment slot="previous">
+                {#if prevImage}
+                    <img
+                        class="image"
+                        src={prevImage.starred.imageUrl}
+                        alt={prevImage.starred.name}
+                    />
+                {/if}
+            </svelte:fragment>
 
-            <button on:click|stopPropagation={() => navigate("next")}>
-                <!-- svelte-ignore a11y-img-redundant-alt -->
+            <svelte:fragment slot="current">
                 <img
-                    alt="Next image"
-                    src="/right.svg"
-                    width="24px"
-                    height="24px"
+                    class="image"
+                    src={image.starred.imageUrl}
+                    alt={image.starred.name}
                 />
-            </button>
-        </div>
-    {/if}
-</div>
+            </svelte:fragment>
+
+            <svelte:fragment slot="next">
+                {#if nextImage}
+                    <img
+                        class="image"
+                        src={nextImage.starred.imageUrl}
+                        alt={nextImage.starred.name}
+                    />
+                {/if}
+            </svelte:fragment>
+        </Carousel>
+
+        {#if showActionsPanel}
+            <div
+                class="actions-panel"
+                transition:fade={{ duration: 200, easing: sineInOut }}
+            >
+                <button on:click|stopPropagation={() => navigate("previous")}>
+                    <!-- svelte-ignore a11y-img-redundant-alt -->
+                    <img
+                        alt="Previous image"
+                        src="/left.svg"
+                        width="24px"
+                        height="24px"
+                    />
+                </button>
+
+                <button on:click|stopPropagation={() => navigate("next")}>
+                    <!-- svelte-ignore a11y-img-redundant-alt -->
+                    <img
+                        alt="Next image"
+                        src="/right.svg"
+                        width="24px"
+                        height="24px"
+                    />
+                </button>
+            </div>
+        {/if}
+    </div>
+</Modal>
 
 <style>
     .lightbox {

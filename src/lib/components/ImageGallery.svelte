@@ -96,15 +96,14 @@
     />
 
     {#if selectedImage}
-        <Modal on:close={closeLightbox}>
-            <Lightbox
-                image={selectedImage}
-                prevImage={previousImage}
-                {nextImage}
-                on:next={navigateToNextImage}
-                on:previous={navigateToPreviousImage}
-            />
-        </Modal>
+        <Lightbox
+            image={selectedImage}
+            prevImage={previousImage}
+            {nextImage}
+            on:next={navigateToNextImage}
+            on:previous={navigateToPreviousImage}
+            on:close={closeLightbox}
+        />
     {/if}
 
     <ImageGrid
