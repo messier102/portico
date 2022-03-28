@@ -36,76 +36,51 @@
         }
     }
 
-    let touchStartViewportY = 0;
-    let touchStartLightboxTranslateY = 0;
+    let touchStartY = 0;
 
-    let lightboxTranslateY = tweened<number>(0, {
+    let sliderInitialOffsetY = 0;
+
+    let sliderOffsetY = tweened(0, {
         easing: cubicOut,
         duration: 0,
     });
-    $: lightboxTranslateDeltaY =
-        $lightboxTranslateY - touchStartLightboxTranslateY;
 
-    let transition: "previous" | "none" | "next" = "none";
-
-    function handleTouchStart(e: TouchEvent) {
-        if ($lightboxTranslateY !== 0) {
-            // if in the middle of a transition, fix it in place
-            $lightboxTranslateY = $lightboxTranslateY;
-
-            // if in the middle of a transition, perform navigation and move
-            // lightbox to match the Y position
-            if (transition === "previous") {
-                navigate("previous");
-                $lightboxTranslateY -= document.documentElement.clientHeight;
-                transition = "none";
-            } else if (transition === "next") {
-                navigate("next");
-                $lightboxTranslateY += document.documentElement.clientHeight;
-                transition = "none";
-            }
+    function handleTouchStart(event: TouchEvent) {
+        if ($sliderOffsetY !== 0) {
+            // stop tweening and pin slider in place
+            $sliderOffsetY = $sliderOffsetY;
         }
 
-        touchStartViewportY = e.changedTouches[0].clientY;
-        touchStartLightboxTranslateY = $lightboxTranslateY;
+        touchStartY = event.changedTouches[0].clientY;
+        sliderInitialOffsetY = $sliderOffsetY;
     }
 
-    function handleTouchMove(e: TouchEvent) {
-        const touchMoveViewportY = e.changedTouches[0].clientY;
-        const touchDeltaY = touchMoveViewportY - touchStartViewportY;
+    function handleTouchMove(event: TouchEvent) {
+        const touchMoveY = event.changedTouches[0].clientY;
+        const touchDeltaY = touchMoveY - touchStartY;
 
-        $lightboxTranslateY = touchStartLightboxTranslateY + touchDeltaY;
+        $sliderOffsetY = sliderInitialOffsetY + touchDeltaY;
     }
 
-    async function handleTouchEnd(e: TouchEvent) {
+    async function handleTouchEnd(_: TouchEvent) {
         const swipeThreshold = 100;
+        const sliderOffsetDeltaY = $sliderOffsetY - sliderInitialOffsetY;
 
-        if (lightboxTranslateDeltaY > swipeThreshold && prevImage) {
-            // go to previous
-            transition = "previous";
-
-            await lightboxTranslateY.set(
-                document.documentElement.clientHeight,
-                { duration: 500 }
-            );
+        if (sliderOffsetDeltaY > swipeThreshold && prevImage) {
             navigate("previous");
-            transition = "none";
-        } else if (lightboxTranslateDeltaY < -swipeThreshold && nextImage) {
-            // go to next
-            transition = "next";
-            await lightboxTranslateY.set(
-                -document.documentElement.clientHeight,
-                { duration: 500 }
-            );
+
+            $sliderOffsetY -= viewportHeight;
+        } else if (sliderOffsetDeltaY < -swipeThreshold && nextImage) {
             navigate("next");
-            transition = "none";
-        } else {
-            // reset
-            await lightboxTranslateY.set(0, { duration: 500 });
+
+            $sliderOffsetY += viewportHeight;
         }
 
-        $lightboxTranslateY = 0;
-        touchStartViewportY = 0;
+        await sliderOffsetY.set(0, { duration: 500 });
+    }
+
+    async function handleTouchCancel() {
+        await sliderOffsetY.set(0, { duration: 500 });
     }
 </script>
 
@@ -117,12 +92,13 @@
 
 <div class="lightbox" on:click={() => (showActionsPanel = !showActionsPanel)}>
     <div
-        class="image-container"
+        class="slider"
         on:touchstart={handleTouchStart}
         on:touchmove={handleTouchMove}
         on:touchend={handleTouchEnd}
+        on:touchcancel={handleTouchCancel}
         style:--viewportHeight={`${viewportHeight}px`}
-        style:--translateY={`${$lightboxTranslateY}px`}
+        style:--sliderOffsetY={`${$sliderOffsetY}px`}
     >
         {#if prevImage}
             <div class="prev-image">
@@ -182,10 +158,10 @@
 </div>
 
 <style>
-    .image-container {
+    .slider {
         display: grid;
         grid-template-rows: repeat(3, var(--viewportHeight));
-        transform: translateY(var(--translateY));
+        transform: translateY(var(--sliderOffsetY));
     }
 
     .image {
