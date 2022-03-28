@@ -75,13 +75,13 @@
 
 <div
     class="slider"
+    class:animating={isAnimating}
     on:touchstart={handleTouchStart}
     on:touchmove={handleTouchMove}
     on:touchend={handleTouchEnd}
     on:touchcancel={handleTouchCancel}
     style:--viewportHeight={`${viewportHeight}px`}
     style:--sliderOffsetY={`${$sliderOffsetY}px`}
-    class:animating={isAnimating}
 >
     <div class="previous">
         <slot name="previous" />
