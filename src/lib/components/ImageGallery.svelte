@@ -1,8 +1,8 @@
 <script lang="ts">
     import ControlPanel from "$lib/components/ControlPanel.svelte";
     import ImageGrid from "$lib/components/ImageGrid.svelte";
-    import Lightbox from "$lib/components/Lightbox.svelte";
-    import Modal from "./Modal.svelte";
+    import Lightbox from "$lib/components/lightbox/Lightbox.svelte";
+    import Modal from "./lightbox/Modal.svelte";
     import { persisted } from "$lib/model/persisted";
     import { ImageFeed } from "$lib/model/ImageFeed";
     import { Source, SourceStream } from "$lib/model/ImageSource";

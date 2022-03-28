@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { AnnotatedImage } from "../model/ImageFeed";
+    import { AnnotatedImage } from "$lib/model/ImageFeed";
     import { fade } from "svelte/transition";
     import { sineInOut } from "svelte/easing";
     import { createEventDispatcher } from "svelte";
