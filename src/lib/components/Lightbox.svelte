@@ -1,46 +1,24 @@
 <script lang="ts">
-    import { swipeable, SwipeEvent } from "../actions/swipeable";
+    import { tweened } from "svelte/motion";
     import { AnnotatedImage } from "../model/ImageFeed";
     import { fade } from "svelte/transition";
-    import { sineInOut } from "svelte/easing";
-    import { createEventDispatcher, tick } from "svelte";
+    import { cubicOut, sineInOut } from "svelte/easing";
+    import { createEventDispatcher } from "svelte";
 
     const dispatch = createEventDispatcher();
 
     export let image: AnnotatedImage;
-    export let autoRotate: boolean;
+    export let prevImage: AnnotatedImage | null;
+    export let nextImage: AnnotatedImage | null;
 
     let showActionsPanel: boolean = true;
-    let rotationDegrees: number = 0;
 
-    $: {
-        // subscribe to image changes
-        if (image && autoRotate) {
-            tryAutoRotate();
-        }
-    }
+    // see https://chanind.github.io/javascript/2019/09/28/avoid-100vh-on-mobile-web.html
+    let viewportHeight: number = 0;
+    let viewportWidth: number = 0;
 
     function navigate(direction: "next" | "previous") {
         dispatch(direction);
-        rotationDegrees = 0;
-    }
-
-    function rotate(direction: "left" | "right") {
-        // TODO: Silently reset every 360 rotation to 0 to prevent excessive spin.
-        // Not sure how to temporarily disable the rotation transition to do that.
-        rotationDegrees = rotationDegrees + (direction === "left" ? -90 : 90);
-    }
-
-    function tryAutoRotate() {
-        const { width: imgWidth, height: imgHeight } = image.img;
-        const { clientWidth, clientHeight } = document.documentElement;
-
-        if (
-            (imgHeight > imgWidth && clientHeight < clientWidth) ||
-            (imgHeight < imgWidth && clientHeight > clientWidth)
-        ) {
-            rotationDegrees = 90;
-        }
     }
 
     function handleKeydown(e: KeyboardEvent) {
@@ -54,63 +32,132 @@
                 navigate("previous");
             } else if (e.code === "ArrowRight" || e.code === "KeyD") {
                 navigate("next");
-            } else if (e.code === "KeyQ") {
-                rotate("left");
-            } else if (e.code === "KeyE") {
-                rotate("right");
             }
         }
     }
 
-    function handleSwipe(e: SwipeEvent) {
-        if (e.detail.direction === "up") {
-            navigate("next");
-        } else if (e.detail.direction === "down") {
-            navigate("previous");
+    let touchStartViewportY = 0;
+    let touchStartLightboxTranslateY = 0;
+
+    let lightboxTranslateY = tweened<number>(0, {
+        easing: cubicOut,
+        duration: 0,
+    });
+    $: lightboxTranslateDeltaY =
+        $lightboxTranslateY - touchStartLightboxTranslateY;
+
+    let transition: "previous" | "none" | "next" = "none";
+
+    function handleTouchStart(e: TouchEvent) {
+        if ($lightboxTranslateY !== 0) {
+            // if in the middle of a transition, fix it in place
+            $lightboxTranslateY = $lightboxTranslateY;
+
+            // if in the middle of a transition, perform navigation and move
+            // lightbox to match the Y position
+            if (transition === "previous") {
+                navigate("previous");
+                $lightboxTranslateY -= document.documentElement.clientHeight;
+                transition = "none";
+            } else if (transition === "next") {
+                navigate("next");
+                $lightboxTranslateY += document.documentElement.clientHeight;
+                transition = "none";
+            }
         }
+
+        touchStartViewportY = e.changedTouches[0].clientY;
+        touchStartLightboxTranslateY = $lightboxTranslateY;
+    }
+
+    function handleTouchMove(e: TouchEvent) {
+        const touchMoveViewportY = e.changedTouches[0].clientY;
+        const touchDeltaY = touchMoveViewportY - touchStartViewportY;
+
+        $lightboxTranslateY = touchStartLightboxTranslateY + touchDeltaY;
+    }
+
+    async function handleTouchEnd(e: TouchEvent) {
+        const swipeThreshold = 100;
+
+        if (lightboxTranslateDeltaY > swipeThreshold && prevImage) {
+            // go to previous
+            transition = "previous";
+
+            await lightboxTranslateY.set(
+                document.documentElement.clientHeight,
+                { duration: 500 }
+            );
+            navigate("previous");
+            transition = "none";
+        } else if (lightboxTranslateDeltaY < -swipeThreshold && nextImage) {
+            // go to next
+            transition = "next";
+            await lightboxTranslateY.set(
+                -document.documentElement.clientHeight,
+                { duration: 500 }
+            );
+            navigate("next");
+            transition = "none";
+        } else {
+            // reset
+            await lightboxTranslateY.set(0, { duration: 500 });
+        }
+
+        $lightboxTranslateY = 0;
+        touchStartViewportY = 0;
     }
 </script>
 
-<svelte:window on:keydown={handleKeydown} />
+<svelte:window
+    on:keydown={handleKeydown}
+    bind:innerHeight={viewportHeight}
+    bind:innerWidth={viewportWidth}
+/>
 
-<div
-    class="wrapper"
-    use:swipeable
-    on:click={() => (showActionsPanel = !showActionsPanel)}
-    on:swipe={(e) => handleSwipe(e)}
->
-    <img
-        class="image"
-        src={image.starred.imageUrl}
-        alt={image.starred.name}
-        class:rotated-90={(rotationDegrees + 90) % 180 === 0}
-        style:--angle={rotationDegrees + "deg"}
-        style:--scale={image.img.height / image.img.width}
-    />
+<div class="lightbox" on:click={() => (showActionsPanel = !showActionsPanel)}>
+    <div
+        class="image-container"
+        on:touchstart={handleTouchStart}
+        on:touchmove={handleTouchMove}
+        on:touchend={handleTouchEnd}
+        style:--viewportHeight={`${viewportHeight}px`}
+        style:--translateY={`${$lightboxTranslateY}px`}
+    >
+        {#if prevImage}
+            <div class="prev-image">
+                <img
+                    class="image"
+                    src={prevImage.starred.imageUrl}
+                    alt={prevImage.starred.name}
+                />
+            </div>
+        {/if}
+
+        <div class="current-image">
+            <img
+                class="image"
+                src={image.starred.imageUrl}
+                alt={image.starred.name}
+            />
+        </div>
+
+        {#if nextImage}
+            <div class="next-image">
+                <img
+                    class="image"
+                    src={nextImage.starred.imageUrl}
+                    alt={nextImage.starred.name}
+                />
+            </div>
+        {/if}
+    </div>
 
     {#if showActionsPanel}
         <div
             class="actions-panel"
             transition:fade={{ duration: 200, easing: sineInOut }}
         >
-            <button on:click|stopPropagation={() => rotate("left")}>
-                <img
-                    alt="Rotate left"
-                    src="/rotate-left.svg"
-                    width="24px"
-                    height="24px"
-                />
-            </button>
-
-            <button on:click|stopPropagation={() => rotate("right")}>
-                <img
-                    alt="Rotate right"
-                    src="/rotate-right.svg"
-                    width="24px"
-                    height="24px"
-                />
-            </button>
-
             <button on:click|stopPropagation={() => navigate("previous")}>
                 <!-- svelte-ignore a11y-img-redundant-alt -->
                 <img
@@ -135,6 +182,30 @@
 </div>
 
 <style>
+    .image-container {
+        display: grid;
+        grid-template-rows: repeat(3, var(--viewportHeight));
+        transform: translateY(var(--translateY));
+    }
+
+    .image {
+        object-fit: contain;
+        height: 100%;
+        width: 100%;
+    }
+
+    .prev-image {
+        grid-row: 1 / span 1;
+    }
+
+    .current-image {
+        grid-row: 2 / span 1;
+    }
+
+    .next-image {
+        grid-row: 3 / span 1;
+    }
+
     .actions-panel {
         display: flex;
         justify-content: space-evenly;
@@ -151,21 +222,8 @@
         align-items: center;
     }
 
-    .wrapper {
+    .lightbox {
         display: flex;
         justify-content: center;
-    }
-
-    .image {
-        object-fit: contain;
-        height: 100vh;
-        width: 100vw;
-        transform: rotate(var(--angle));
-        transition: 0.4s ease;
-    }
-
-    .rotated-90 {
-        height: min(100vw, calc(100vh * var(--scale)));
-        width: max(100vh, calc(100vw * var(--scale)));
     }
 </style>
