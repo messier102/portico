@@ -1,8 +1,8 @@
 <script lang="ts">
     import ControlPanel from "$lib/components/ControlPanel.svelte";
     import ImageGrid from "$lib/components/ImageGrid.svelte";
-    import Lightbox from "$lib/components/Lightbox.svelte";
-    import Modal from "./Modal.svelte";
+    import Lightbox from "$lib/components/lightbox/Lightbox.svelte";
+    import Modal from "./lightbox/Modal.svelte";
     import { persisted } from "$lib/model/persisted";
     import { ImageFeed } from "$lib/model/ImageFeed";
     import { Source, SourceStream } from "$lib/model/ImageSource";
@@ -11,7 +11,6 @@
     const columnCount = persisted("columnCount", 3);
     const showIndex = persisted("showIndex", false);
     const showNsfw = persisted("showNsfw", false);
-    const autoRotate = persisted("autoRotate", false);
 
     let screenIsFilled = false;
 
@@ -38,6 +37,10 @@
     let selectedImageIndex: number | null = null;
     $: selectedImage =
         selectedImageIndex !== null ? $imageFeed[selectedImageIndex] : null;
+    $: previousImage =
+        selectedImageIndex !== null ? $imageFeed[selectedImageIndex - 1] : null;
+    $: nextImage =
+        selectedImageIndex !== null ? $imageFeed[selectedImageIndex + 1] : null;
 
     async function tryFetch() {
         do {
@@ -64,6 +67,7 @@
         const nextIndex = (selectedImageIndex as number) + 1;
         await imageFeed.at(nextIndex);
         selectedImageIndex = nextIndex;
+        imageFeed.at(nextIndex + 1); // load ahead
     }
 
     async function navigateToPreviousImage() {
@@ -87,20 +91,19 @@
         bind:columnCount={$columnCount}
         bind:showIndex={$showIndex}
         bind:showNsfw={$showNsfw}
-        bind:autoRotate={$autoRotate}
         bind:imageSource
         bind:fullScreen
     />
 
     {#if selectedImage}
-        <Modal on:close={closeLightbox}>
-            <Lightbox
-                image={selectedImage}
-                autoRotate={$autoRotate}
-                on:next={navigateToNextImage}
-                on:previous={navigateToPreviousImage}
-            />
-        </Modal>
+        <Lightbox
+            image={selectedImage}
+            prevImage={previousImage}
+            {nextImage}
+            on:next={navigateToNextImage}
+            on:previous={navigateToPreviousImage}
+            on:close={closeLightbox}
+        />
     {/if}
 
     <ImageGrid

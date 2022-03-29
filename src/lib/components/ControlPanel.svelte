@@ -5,7 +5,6 @@
     export let maxColumnCount: number;
     export let showIndex: boolean;
     export let showNsfw: boolean;
-    export let autoRotate: boolean;
     export let fullScreen: boolean;
     export let imageSource: Source<unknown, unknown>;
 
@@ -46,9 +45,6 @@
 
             <input type="checkbox" id="index" bind:checked={showIndex} />
             <label for="index" />
-
-            <input type="checkbox" id="autorotate" bind:checked={autoRotate} />
-            <label for="autorotate" />
 
             <input type="checkbox" id="nsfw" bind:checked={showNsfw} />
             <label for="nsfw" />
@@ -137,15 +133,6 @@
     }
 
     #index:checked + label {
-        background-color: white;
-    }
-
-    #autorotate + label {
-        -webkit-mask-image: url("/rotate-left.svg");
-        mask-image: url("/rotate-left.svg");
-    }
-
-    #autorotate:checked + label {
         background-color: white;
     }
 
