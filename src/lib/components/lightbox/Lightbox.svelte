@@ -49,29 +49,35 @@
         >
             <svelte:fragment slot="previous">
                 {#if prevImage}
-                    <img
-                        class="image"
-                        src={prevImage.starred.imageUrl}
-                        alt={prevImage.starred.name}
-                    />
+                    {#key image}
+                        <img
+                            class="image"
+                            src={prevImage.starred.imageUrl}
+                            alt={prevImage.starred.name}
+                        />
+                    {/key}
                 {/if}
             </svelte:fragment>
 
             <svelte:fragment slot="current">
-                <img
-                    class="image"
-                    src={image.starred.imageUrl}
-                    alt={image.starred.name}
-                />
+                {#key image}
+                    <img
+                        class="image"
+                        src={image.starred.imageUrl}
+                        alt={image.starred.name}
+                    />
+                {/key}
             </svelte:fragment>
 
             <svelte:fragment slot="next">
                 {#if nextImage}
-                    <img
-                        class="image"
-                        src={nextImage.starred.imageUrl}
-                        alt={nextImage.starred.name}
-                    />
+                    {#key image}
+                        <img
+                            class="image"
+                            src={nextImage.starred.imageUrl}
+                            alt={nextImage.starred.name}
+                        />
+                    {/key}
                 {/if}
             </svelte:fragment>
         </Carousel>
