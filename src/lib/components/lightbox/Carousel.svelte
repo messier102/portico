@@ -83,15 +83,15 @@
     style:--viewportHeight={`${viewportHeight}px`}
     style:--sliderOffsetY={`${$sliderOffsetY}px`}
 >
-    <div class="previous">
+    <div class="slot previous">
         <slot name="previous" />
     </div>
 
-    <div class="current">
+    <div class="slot current">
         <slot name="current" />
     </div>
 
-    <div class="next">
+    <div class="slot next">
         <slot name="next" />
     </div>
 </div>
@@ -117,5 +117,9 @@
 
     .next {
         grid-row: 3 / span 1;
+    }
+
+    .slot {
+        pointer-events: none;
     }
 </style>
