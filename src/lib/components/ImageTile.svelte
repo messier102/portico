@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { onMount } from "svelte";
     import { InternalImage } from "../model/ImageSource";
 
     export let starred: InternalImage;
@@ -7,17 +8,23 @@
     export let loadedIdx: number;
     export let showIndex: boolean;
 
+    let image: HTMLImageElement;
     let imageLoaded = false;
+
+    onMount(async () => {
+        await image.decode();
+        imageLoaded = true;
+    });
 </script>
 
 <div class="tile" on:click>
     <!-- Element order is significant (determines z-index) -->
     <img
+        bind:this={image}
         class:hidden={!imageLoaded}
         class:blurred={!showNsfw && starred.isNsfw}
         src={starred.imageUrl}
         alt={starred.name}
-        on:load={() => (imageLoaded = true)}
     />
 
     {#if showIndex}
