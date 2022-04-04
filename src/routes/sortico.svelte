@@ -18,11 +18,14 @@
     $: currentImage = $imageFeed[currentIndex];
     $: nextImage = $imageFeed[currentIndex + 1];
 
+    let isAnimating = false;
+
     let angle = tweened(0, { easing: sineOut, duration: 0 });
     let scale = tweened(0.5, { easing: sineOut, duration: 0 });
     let touchStartX = 0;
 
     function handleTouchStart(event: TouchEvent) {
+        isAnimating = true;
         touchStartX = event.changedTouches[0].clientX;
     }
 
@@ -46,9 +49,13 @@
             $angle = 0;
             $scale = 0.5;
         } else {
-            angle.set(0, { duration: 500 });
-            scale.set(0.5, { duration: 500 });
+            await Promise.all([
+                angle.set(0, { duration: 500 }),
+                scale.set(0.5, { duration: 500 }),
+            ]);
         }
+
+        isAnimating = false;
     }
 </script>
 
@@ -57,6 +64,7 @@
         {#if currentImage}
             <img
                 class="current"
+                class:animating={isAnimating}
                 src={currentImage.starred.imageUrl}
                 alt={currentImage.starred.name}
                 on:touchstart={handleTouchStart}
@@ -68,6 +76,7 @@
         {#if nextImage}
             <img
                 class="next"
+                class:animating={isAnimating}
                 src={nextImage.starred.imageUrl}
                 alt={nextImage.starred.name}
                 style:--scale={$scale}
@@ -110,5 +119,9 @@
 
     .next {
         transform: scale(var(--scale));
+    }
+
+    .animating {
+        will-change: transform;
     }
 </style>
