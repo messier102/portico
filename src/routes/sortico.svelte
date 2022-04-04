@@ -21,7 +21,7 @@
     let isAnimating = false;
 
     let angle = tweened(0, { easing: sineOut, duration: 0 });
-    let scale = tweened(0.5, { easing: sineOut, duration: 0 });
+    $: scale = 0.5 + 0.5 * (Math.abs($angle) / 30);
     let touchStartX = 0;
 
     function handleTouchStart(event: TouchEvent) {
@@ -34,25 +34,17 @@
         const touchDeltaX = touchMoveX - touchStartX;
 
         $angle = touchDeltaX / 30;
-        $scale = 0.5 + Math.abs(touchDeltaX) / 1000;
     }
 
     async function handleTouchEnd(event: TouchEvent) {
         if (Math.abs($angle) > 5) {
-            await Promise.all([
-                angle.set(30 * Math.sign($angle), { duration: 500 }),
-                scale.set(1, { duration: 500 }),
-            ]);
+            await angle.set(30 * Math.sign($angle), { duration: 500 });
 
             currentIndex += 1;
 
             $angle = 0;
-            $scale = 0.5;
         } else {
-            await Promise.all([
-                angle.set(0, { duration: 500 }),
-                scale.set(0.5, { duration: 500 }),
-            ]);
+            await angle.set(0, { duration: 500 });
         }
 
         isAnimating = false;
@@ -79,7 +71,7 @@
                 class:animating={isAnimating}
                 src={nextImage.starred.imageUrl}
                 alt={nextImage.starred.name}
-                style:--scale={$scale}
+                style:--scale={scale}
             />
         {/if}
     </div>
