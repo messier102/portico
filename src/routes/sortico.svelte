@@ -27,8 +27,8 @@
     let touchStartX = 0;
     let touchStartY = 0;
     let angleThreshold = 5;
-    $: leftOpacity = $angle < 0 ? -$angle / (maxAngle / 2) : 0;
-    $: rightOpacity = $angle > 0 ? $angle / (maxAngle / 2) : 0;
+    $: leftOpacity = $angle < 0 ? Math.sin(-$angle * (Math.PI / maxAngle)) : 0;
+    $: rightOpacity = $angle > 0 ? Math.sin($angle * (Math.PI / maxAngle)) : 0;
 
     function handleTouchStart(event: TouchEvent) {
         isAnimating = true;
