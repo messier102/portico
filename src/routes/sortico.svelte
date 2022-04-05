@@ -76,6 +76,8 @@
                 style:--angle={$angle + "deg"}
                 style:--offsetY={$offsetY + "px"}
             />
+        {:else}
+            <button on:click={() => (currentIndex = 0)}>Reset</button>
         {/if}
         {#if nextImage}
             <img
