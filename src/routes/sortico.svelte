@@ -26,6 +26,9 @@
     $: scale = 0.5 + 0.5 * (Math.abs($angle) / maxAngle);
     let touchStartX = 0;
     let touchStartY = 0;
+    let angleThreshold = 5;
+    $: leftOpacity = $angle < 0 ? -$angle / (maxAngle / 2) : 0;
+    $: rightOpacity = $angle > 0 ? $angle / (maxAngle / 2) : 0;
 
     function handleTouchStart(event: TouchEvent) {
         isAnimating = true;
@@ -44,7 +47,7 @@
     }
 
     async function handleTouchEnd(event: TouchEvent) {
-        if (Math.abs($angle) > 5) {
+        if (Math.abs($angle) > angleThreshold) {
             await angle.set(maxAngle * Math.sign($angle), { duration: 500 });
 
             currentIndex += 1;
@@ -88,6 +91,8 @@
                 style:--scale={scale}
             />
         {/if}
+        <div class="left-gradient" style:--left-opacity={leftOpacity} />
+        <div class="right-gradient" style:--right-opacity={rightOpacity} />
     </div>
 </main>
 
@@ -138,5 +143,37 @@
 
     .animating {
         will-change: transform;
+    }
+
+    .left-gradient {
+        z-index: 101;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+            65deg,
+            rgba(11, 146, 250, 0.8),
+            rgba(0, 0, 0, 0) 50%
+        );
+        opacity: var(--left-opacity);
+        pointer-events: none;
+    }
+
+    .right-gradient {
+        z-index: 101;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+            -65deg,
+            rgba(250, 71, 11, 0.8),
+            rgba(0, 0, 0, 0) 50%
+        );
+        opacity: var(--right-opacity);
+        pointer-events: none;
     }
 </style>
