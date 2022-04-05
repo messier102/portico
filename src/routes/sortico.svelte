@@ -20,31 +20,42 @@
 
     let isAnimating = false;
 
+    const maxAngle = 30;
     let angle = tweened(0, { easing: sineOut, duration: 0 });
-    $: scale = 0.5 + 0.5 * (Math.abs($angle) / 30);
+    let offsetY = tweened(0, { easing: sineOut, duration: 0 });
+    $: scale = 0.5 + 0.5 * (Math.abs($angle) / maxAngle);
     let touchStartX = 0;
+    let touchStartY = 0;
 
     function handleTouchStart(event: TouchEvent) {
         isAnimating = true;
         touchStartX = event.changedTouches[0].clientX;
+        touchStartY = event.changedTouches[0].clientY;
     }
 
     function handleTouchMove(event: TouchEvent) {
         const touchMoveX = event.changedTouches[0].clientX;
+        const touchMoveY = event.changedTouches[0].clientY;
         const touchDeltaX = touchMoveX - touchStartX;
+        const touchDeltaY = touchMoveY - touchStartY;
 
-        $angle = touchDeltaX / 30;
+        $angle = touchDeltaX / maxAngle;
+        $offsetY = touchDeltaY;
     }
 
     async function handleTouchEnd(event: TouchEvent) {
         if (Math.abs($angle) > 5) {
-            await angle.set(30 * Math.sign($angle), { duration: 500 });
+            await angle.set(maxAngle * Math.sign($angle), { duration: 500 });
 
             currentIndex += 1;
 
             $angle = 0;
+            $offsetY = 0;
         } else {
-            await angle.set(0, { duration: 500 });
+            await Promise.all([
+                angle.set(0, { duration: 500 }),
+                offsetY.set(0, { duration: 500 }),
+            ]);
         }
 
         isAnimating = false;
@@ -63,6 +74,7 @@
                 on:touchmove={handleTouchMove}
                 on:touchend={handleTouchEnd}
                 style:--angle={$angle + "deg"}
+                style:--offsetY={$offsetY + "px"}
             />
         {/if}
         {#if nextImage}
@@ -78,9 +90,18 @@
 </main>
 
 <style>
+    /* prevent reflow caused by address bar hiding on mobile */
+    :global(html),
+    :global(body) {
+        margin: 0;
+        height: 100%;
+        overflow: hidden;
+        overscroll-behavior: contain;
+    }
+
     main {
-        height: 100vh;
-        width: 100vw;
+        height: 100%;
+        width: 100%;
         overflow: hidden;
     }
 
@@ -103,8 +124,8 @@
     }
 
     .current {
-        transform: rotate(var(--angle));
-        transform-origin: 50% 200%;
+        transform: rotate(var(--angle)) translateY(var(--offsetY));
+        transform-origin: center 300%;
         z-index: 100;
         filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.6));
     }
