@@ -1,5 +1,10 @@
 import { tick } from "svelte";
-import { writable, Unsubscriber, Writable } from "svelte/store";
+import {
+    writable,
+    Unsubscriber,
+    Writable,
+    Readable,
+} from "svelte/store";
 import { prefetchDimensions } from "../util/prefetchDimensions";
 import { TaskQueue } from "../util/TaskQueue";
 import { SourceStream, InternalImage } from "./ImageSource";
@@ -13,7 +18,8 @@ export type AnnotatedImage = {
 };
 
 export class ImageFeed {
-    exhausted: boolean = false;
+    private _exhausted: Writable<boolean> = writable(false);
+    readonly exhausted: Readable<boolean> = { subscribe: this._exhausted.subscribe };
 
     private isFetching: boolean = false;
 
@@ -57,7 +63,7 @@ export class ImageFeed {
         const moreImagesFiltered = await this.source.fetchNextPage();
 
         if (moreImagesFiltered.length === 0) {
-            this.exhausted = true;
+            this._exhausted.set(true);
             return;
         }
 

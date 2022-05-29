@@ -34,6 +34,8 @@
     const sourceStream = new SourceStream(imageSource);
     const imageFeed = new ImageFeed(sourceStream);
 
+    const feedExhausted = imageFeed.exhausted;
+
     let selectedImageIndex: number | null = null;
     $: selectedImage =
         selectedImageIndex !== null ? $imageFeed[selectedImageIndex] : null;
@@ -46,10 +48,13 @@
         do {
             console.log("Trying to fetch");
 
-            if (!imageFeed.exhausted) {
-                console.log("Fetching");
-                await imageFeed.requestFetch();
+            if ($feedExhausted) {
+                console.log("Feed exhausted");
+                break;
             }
+
+            console.log("Fetching");
+            await imageFeed.requestFetch();
 
             console.log("Done fetching");
         } while (!screenIsFilled);
@@ -114,17 +119,19 @@
         on:select={(e) => openLightbox(e.detail)}
     />
 
-    <IntersectionObserver
-        on:enter={tryFetch}
-        on:exit|once={() => (screenIsFilled = true)}
-    >
-        <img
-            class="loading"
-            alt="Loading indicator"
-            src="/loading.svg"
-            width="50px"
-        />
-    </IntersectionObserver>
+    {#if !$feedExhausted}
+        <IntersectionObserver
+            on:enter={tryFetch}
+            on:exit|once={() => (screenIsFilled = true)}
+        >
+            <img
+                class="loading"
+                alt="Loading indicator"
+                src="/loading.svg"
+                width="50px"
+            />
+        </IntersectionObserver>
+    {/if}
 </main>
 
 <style>
